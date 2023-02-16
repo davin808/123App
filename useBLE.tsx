@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { getDeviceSync } from 'react-native-device-info';
 import DeviceInfo from 'react-native-device-info';
 import {PERMISSIONS, RESULTS, requestMultiple} from 'react-native-permissions';
+import { atob, btoa } from 'react-native-quick-base64';
 
 
 // request permissions in android
@@ -11,13 +12,30 @@ type VoidCallback =  (result: boolean) => void;
 
 const bleManager = new BleManager();
 
+const pi_UUID = '0000';
+const pi_CHARACTERISTIC = '0000';
 
 interface BluetoothLowEnergyApi {
     requestPermissions(cb: VoidCallback): Promise<void>; // request permisison for refined location
+    connectToDevice(device: Device): Promise<void>; // method for connecting
     scanForDevices(): void; // interface for scan for devices
+    currentDevice: Device | null;
     allDevices: Device[]; // devices state array of device structs
+    disconnectFromDevice: () => void;
+    command: number;
+   
 }
 
+export interface CMD {
+    opCode: BigInt;
+    commandData: BigInt;
+  }
+  
+
+export enum COMMAND_TYPE {  // use to decypher command type
+    CALIBRATE = 1,
+    WORKOUT = 2,
+}
 
 
 
@@ -25,7 +43,11 @@ interface BluetoothLowEnergyApi {
 export default function useBLE(): BluetoothLowEnergyApi{
     //create state that will hold all devices in a array found on scan. 
     const [allDevices, setAllDevices] = useState<Device[]>([]);
+    const [currentDevice, setCurrentDevice] = useState<Device | null>(null);
+    const [command, setcommand] = useState<number>(0);
+
     
+
     // request permission from user
     const requestPermissions = async (cb: VoidCallback) => {
         //check os
@@ -99,12 +121,58 @@ export default function useBLE(): BluetoothLowEnergyApi{
         console.log("end");
 
     }
+
+    const connectToDevice = async (device: Device) => {
+        try{
+            const deviceConnection = await bleManager.connectToDevice(device.id);
+            setCurrentDevice(deviceConnection);
+            await deviceConnection.discoverAllServicesAndCharacteristics();
+            bleManager.stopDeviceScan();
+            startStreamingData(deviceConnection);
+        } catch (error1) {
+            console.log('failed to connect', error1);
+        }
+    };
+
+    const disconnectFromDevice = () => {
+        if(currentDevice) {  // if status to connected device is not null
+            bleManager.cancelDeviceConnection(currentDevice.id);  // stop connection
+            setCurrentDevice(null);   //change status to null
+            // setcommand(0);  //reset command
+        }
+    };
+
+    const startStreamingData = async (device: Device) => {
+        if(device){ // if device conneced start listening for data
+            device.monitorCharacteristicForService(pi_UUID,pi_CHARACTERISTIC,() => {});
+        }else { // no current device
+            console.error('NO Device Connected'); 
+        }
+    };
         
-      
+    //const onCommandUpdate = (  // on update read data
+    //     error: BleError | null,
+    //     characteristic: Characteristic | null
+    // ) => {
+    //     if(error) {
+    //         console.error(error);
+    //         return;
+    //     }else if(!characteristic?.value) {
+    //         console.error("No Characteristic Found");
+    //         return;
+    //     }
+    //     const rawData = atob(characteristic.value);  
+    //     const firstBit: number = Number(rawData) & 0x01;   //get first bit of data. can be used like a sign bit for commmand type
+    // }
+
+    
     return {
         requestPermissions, 
         scanForDevices,
+        connectToDevice,
         allDevices,
-
+        currentDevice,
+        disconnectFromDevice,
+        command,
     };
 }
