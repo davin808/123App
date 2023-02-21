@@ -6,10 +6,11 @@ import { SafeAreaView} from 'react-native';
 import {useState} from 'react';
 import{useNavigation} from "@react-navigation/native"
 
+
 const Calibrationcomp = () => {
 
     const [complete, setComplete] = useState(false);
-
+    
     // wait for arduino to say the if completed calibration
     function switchComplete(){
         setComplete(true);

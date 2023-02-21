@@ -9,17 +9,20 @@ import{useNavigation} from "@react-navigation/native"
 
 
 export default function Scancomp() {
-    const {requestPermissions, scanForDevices, allDevices} = useBLE();
+    const {requestPermissions, scanForDevices, allDevices, writeData} = useBLE();
 
     const openModal = async () => {
         requestPermissions(isGranted => {
           if (isGranted) {
             console.log("granted");
             scanForDevices();
-            console.log("finished");
+            //console.log("found in scan", allDevices[0].name);
+            //writeData(allDevices[0]);
+            console.log('gfinished')
             //navigation.navigate('BLE', {name: 'Here from pressing Scan button'});
           }else{
             console.log("Not granted");
+
           }
         });
   

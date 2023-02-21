@@ -7,23 +7,29 @@ import {PERMISSIONS, RESULTS, requestMultiple} from 'react-native-permissions';
 import { atob, btoa } from 'react-native-quick-base64';
 
 
+
 // request permissions in android
 type VoidCallback =  (result: boolean) => void;
 
 const bleManager = new BleManager();
 
+
 const pi_UUID = '0000';
-const pi_CHARACTERISTIC = '0000';
+const pi_CHARACTERISTIC = '00002a57-0000-1000-8000-00805f9b34fb';
+const pi_SERVICE = '0000180a-0000-1000-8000-00805f9b34fb';
+const datatoWrite = btoa("01");
+
 
 interface BluetoothLowEnergyApi {
     requestPermissions(cb: VoidCallback): Promise<void>; // request permisison for refined location
-    connectToDevice(device: Device): Promise<void>; // method for connecting
+    connectToDevice(device: Device): Promise<void>;// method for connecting
     scanForDevices(): void; // interface for scan for devices
+    writeData(device: Device): Promise<void>; // interface for writing to device
     currentDevice: Device | null;
     allDevices: Device[]; // devices state array of device structs
     disconnectFromDevice: () => void;
     command: number;
-   
+
 }
 
 export interface CMD {
@@ -33,8 +39,8 @@ export interface CMD {
   
 
 export enum COMMAND_TYPE {  // use to decypher command type
-    CALIBRATE = 1,
-    WORKOUT = 2,
+    CALIBRATE = 1,  // send command?
+    WORKOUT = 2,    // hearing response?
 }
 
 
@@ -99,6 +105,23 @@ export default function useBLE(): BluetoothLowEnergyApi{
         devices.findIndex(device => nextDevice.id === device.id) > -1;
 
 
+    const connectToDevice = async (device: Device) => {
+        try{
+            const deviceConnection = await bleManager.connectToDevice(device.id);
+            setCurrentDevice(deviceConnection);
+            await deviceConnection.discoverAllServicesAndCharacteristics();
+            const services = await device.services();
+            //console.log(services);
+            const characteristics = await device.characteristicsForService('0000180a-0000-1000-8000-00805f9b34fb');
+            console.log(characteristics)
+            //startStreamingData(deviceConnection);
+            console.log('connected');
+            writeData(allDevices[0]);
+        } catch (error1) {
+            console.log('failed to connect', error1);
+        }
+    };
+
     const scanForDevices = () => {
         console.log("outside");
         bleManager.startDeviceScan(null, null, (error, device) => {
@@ -108,46 +131,78 @@ export default function useBLE(): BluetoothLowEnergyApi{
                 return; 
             }
             
-            if (device && device.name?.includes('B')) {
-                console.log("Found",device.name, device.localName);
-                setAllDevices(prevState => {
-                  if (!isDuplicateDevice(prevState, device)) {
-                    return [...prevState, device];
-                  }
-                  return prevState;
-                });
+            if (device && (device.name?.includes("Arduino") ||
+            device.localName?.includes("DavinBLE"))) {
+                allDevices[0] = device;
+                setCurrentDevice(device);
+                console.log("Found in scan",allDevices[0].name, device.localName);
+                bleManager.stopDeviceScan();
+                connectToDevice(device);
+                console.log('after connect call')
+
+                return(null);
+                // setAllDevices(prevState => {
+                //   if (!isDuplicateDevice(prevState, device)) {
+                //     return [...prevState, device];
+                //   }
+                //   return prevState;
+                // });
             }
         });
         console.log("end");
 
     }
 
-    const connectToDevice = async (device: Device) => {
-        try{
-            const deviceConnection = await bleManager.connectToDevice(device.id);
-            setCurrentDevice(deviceConnection);
-            await deviceConnection.discoverAllServicesAndCharacteristics();
-            bleManager.stopDeviceScan();
-            startStreamingData(deviceConnection);
-        } catch (error1) {
-            console.log('failed to connect', error1);
-        }
-    };
+    
 
     const disconnectFromDevice = () => {
         if(currentDevice) {  // if status to connected device is not null
-            bleManager.cancelDeviceConnection(currentDevice.id);  // stop connection
+            bleManager.cancelDeviceConnection(allDevices[0].id);  // stop connection
             setCurrentDevice(null);   //change status to null
             // setcommand(0);  //reset command
         }
     };
 
-    const startStreamingData = async (device: Device) => {
-        if(device){ // if device conneced start listening for data
-            device.monitorCharacteristicForService(pi_UUID,pi_CHARACTERISTIC,() => {});
-        }else { // no current device
-            console.error('NO Device Connected'); 
-        }
+    // const startStreamingData = async (device: Device) => {
+    //     if(device){ // if device conneced start listening for data
+    //         device.monitorCharacteristicForService(pi_UUID,pi_CHARACTERISTIC,() => {});
+    //     }else { // no current device
+    //         console.error('NO Device Connected'); 
+    //     }
+    // };
+
+    const writeData = async (device: Device) => {
+        try {
+            console.log(device.id);
+            await bleManager.writeCharacteristicWithResponseForDevice(
+                device.id,
+                '0000180a-0000-1000-8000-00805f9b34fb',  // service uuid
+                '00002a57-0000-1000-8000-00805f9b34fb',  //characteristic
+                btoa("01")
+            );
+          } catch (e) {
+            console.log(e);
+          }
+        console.log("Found in write function",allDevices[0].name, device.localName);
+        // if (typeof(allDevices[0]) != 'undefined'){
+        //     console.log('defined');
+        //     allDevices[0].writeCharacteristicWithoutResponseForService(
+        //         '0000180A-0000-1000-8000-00805F9B34FB',
+        //         '00002A57-0000-1000-8000-00805F9B34FB',
+        //         btoa("AQ==")
+        //     )
+        //     bleManager.writeCharacteristicWithoutResponseForDevice(
+        //         allDevices[0].id,
+        //         '0000180A-0000-1000-8000-00805F9B34FB',
+        //         '00002A57-0000-1000-8000-00805F9B34FB',
+        //         btoa("01")
+        //     )
+        //     console.log("finish write");
+        // }else{
+        //     console.log('undefined');
+        // }
+
+        //typeof device !== 'undefined'
     };
         
     //const onCommandUpdate = (  // on update read data
@@ -173,6 +228,7 @@ export default function useBLE(): BluetoothLowEnergyApi{
         allDevices,
         currentDevice,
         disconnectFromDevice,
+        writeData,
         command,
     };
 }

@@ -2,11 +2,11 @@ import React from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import { Button, Box, Center, Text , AlertDialog} from "native-base";
 import useBLE from './useBLE';
-import {BleManager, Device,} from 'react-native-ble-plx';
+import {BleManager, Device, NativeDevice} from 'react-native-ble-plx';
 import { SafeAreaView} from 'react-native';
 import {useState, useRef} from 'react';
 import{useNavigation} from "@react-navigation/native"
-
+import deviceInfoModule from 'react-native-device-info';
 
 
 
@@ -31,9 +31,14 @@ const Scanning = () => {
 
     const navigation = useNavigation();
     // const {requestPermissions, scanForDevices, allDevices} = useBLE();
+    // const dummyman = new BleManager();
+    // const nativedum = new nativeDevice();
+    // const dummy = new Device(dummyman);
 
     const [connect, setConnect] = useState("Not Connected")
     const [calibrate, setCalibrate] = useState("Not Calibrated")
+    const {writeData, disconnectFromDevice, allDevices} = useBLE();
+    //typeof allDevices[0] !== 'undefined'
     // const startScan = () => {
     //     requestPermissions(isGranted => {
     //       if (isGranted) {
@@ -80,8 +85,10 @@ const Scanning = () => {
     // };
 
     const openCalibrate = () => {
-      navigation.navigate('Begin Calibration', {name: 'Here from pressing Calibrate button'});
+      //writeData(allDevices[0]);
 
+      navigation.navigate('Begin Calibration', {name: 'Here from pressing Calibrate button'});
+      
     };
 
     const openScan = () => {
@@ -95,11 +102,16 @@ const Scanning = () => {
     }
 
     const onContinue =() => {
-      navigation.navigate('Choose Workout', {name: 'Here from pressing Scan button'});
+      navigation.navigate("Choose Workout", {name: 'Here from pressing Scan button'});
     }
     
 
     const cancelRef = useRef(null);
+
+    const openDC = () => {
+      disconnectFromDevice();
+      console.log("successfuly disconnected");
+    }
 
     return (
         <SafeAreaView>
@@ -117,9 +129,19 @@ const Scanning = () => {
             </TouchableOpacity> */}
 
             <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Calibrate Your BLE Device</Text>
-            <Button size="lg" onPress={openCalibrate} style = {{marginBottom:200}}>Calibrate</Button>
+            <Button size="lg" onPress={openCalibrate} style = {{marginBottom:10}}>Calibrate</Button>
             
+            <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Disconnect Your BLE Device</Text>
+            <Button size="lg" onPress={openDC} style = {{marginBottom:20}}>Disconnect</Button>
+            
+            {allDevices.map((device: Device) => (
+                <Text fontSize="md" color={'blue.900'}>Connected Device: {device.name}</Text>
+            ))}
 
+            {/* <Text fontSize="md" color={'blue.900'}>Connected Device: {allDevices[0].name}</Text> */}
+
+            <Button size="lg" onPress={() => writeData(allDevices[0])} style = {{marginBottom:10}}>Send 1</Button>
+            
 
             <Button colorScheme= "cyan" onPress={() => setIsOpen(!isOpen)}>
               Start Exercise
@@ -143,6 +165,8 @@ const Scanning = () => {
                 </AlertDialog.Footer>
               </AlertDialog.Content>
             </AlertDialog>
+
+            
           </Box>
           
         </SafeAreaView>
