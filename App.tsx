@@ -27,7 +27,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Calibrationcomp from './calibration';
 import Scancomp from './scan';
-import Workoutcomp from './workout';
+import ChooseComp from './chooseWorkout';
+import WorkoutComp from './workout'
 
 
 const Stack = createNativeStackNavigator();
@@ -43,7 +44,7 @@ function App(): JSX.Element {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NativeBaseProvider>
         <NavigationContainer>
-          <Text style= {{paddingTop: 10, paddingBottom:10, alignSelf:'center', fontSize:30, fontStyle:'italic'}}>BLE React Native App</Text>
+          <Text style= {{paddingTop: 10, paddingBottom:10, alignSelf:'center', fontSize:30, fontStyle:'italic'}}>MOCOPI Exercise App</Text>
           <Stack.Navigator screenOptions={{headerTintColor:'black', headerStyle: { backgroundColor: 'white' }}}>
             <Stack.Screen name ="Home" component = {Scanning} ></Stack.Screen>
               {/* <View style={styles.container}>
@@ -52,7 +53,8 @@ function App(): JSX.Element {
             <Stack.Screen name = "BLE" component = {BLEcomp}></Stack.Screen>
             <Stack.Screen name = "Begin Calibration" component = {Calibrationcomp} options={{presentation: "modal"}}></Stack.Screen>
             <Stack.Screen name = "Begin Scan" component = {Scancomp} ></Stack.Screen>
-            <Stack.Screen name = "Choose Workout" component = {Workoutcomp}></Stack.Screen>
+            <Stack.Screen name = "Choose Workout" component = {ChooseComp}></Stack.Screen>
+            <Stack.Screen name = "Begin Workout!" component = {WorkoutComp}></Stack.Screen>
           </Stack.Navigator>
         
 
