@@ -113,26 +113,46 @@ const Scanning = () => {
       console.log("successfuly disconnected");
     }
 
+    const buttondiyaStyle = {
+      width: 200,
+      height: 50,
+      backgroundColor: '#1a7045',
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 20,
+    };
+
+    const alertbuttons = {
+      width: 150,
+      height: 50,
+      backgroundColor: '#1a7045',
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 100,
+    };
+
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{ flex: 1, justifyContent: 'flex-end' }}>
           <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">       {connect}                      {calibrate}</Text>
           <Box alignItems="center">
 
-            <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Connect to Scan For BLE Devices!</Text>
+            {/* <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Connect to Scan For BLE Devices!</Text> */}
             {/* <Button onPress={() => navigation.navigate('BLE', {name: 'Here from pressing Scan button'})}> Scan </Button> */}
             {/* {allDevices.map((device: Device) => (
             <Text>{device.name}</Text>
             ))} */}
-            <Button size="lg" onPress={openScan}>Scan</Button>
+            <Button size="lg" style = {buttondiyaStyle} onPress={openScan}>CONNECT DEVICE</Button>
             {/* <TouchableOpacity onPress={openModal}> 
             <Text> {"Scan"} </Text>
             </TouchableOpacity> */}
 
-            <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Calibrate Your BLE Device</Text>
-            <Button size="lg" onPress={openCalibrate} style = {{marginBottom:10}}>Calibrate</Button>
+            {/* <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Calibrate Your BLE Device</Text> */}
+            <Button size="lg" onPress={openCalibrate} style = {buttondiyaStyle}>CALIBRATE</Button>
             
-            <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Disconnect Your BLE Device</Text>
-            <Button size="lg" onPress={openDC} style = {{marginBottom:20}}>Disconnect</Button>
+            {/* <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Disconnect Your BLE Device</Text> */}
+            <Button size="lg" onPress={openDC} style = {buttondiyaStyle}>DISCONNECT</Button>
             
             {allDevices.map((device: Device) => (
                 <Text fontSize="md" color={'blue.900'}>Connected Device: {device.name}</Text>
@@ -143,23 +163,20 @@ const Scanning = () => {
             <Button size="lg" onPress={() => writeData(allDevices[0])} style = {{marginBottom:10}}>Send 1</Button>
             
 
-            <Button colorScheme= "cyan" onPress={() => setIsOpen(!isOpen)}>
-              Start Exercise
-            </Button>
+            <Button size="lg" style = {buttondiyaStyle} onPress={() => setIsOpen(!isOpen)}>START EXCERCISE</Button>
             <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
-              <AlertDialog.Content>
+              <AlertDialog.Content style={{ backgroundColor: 'gray' }}>
                 <AlertDialog.CloseButton />
-                <AlertDialog.Header>Please Check</AlertDialog.Header>
+                <AlertDialog.Header style={{textAlign: "center"}}>Please Check</AlertDialog.Header>
                 <AlertDialog.Body>
                   Please double check that the device is connected and calibrated.
                 </AlertDialog.Body>
                 <AlertDialog.Footer>
-                  <Button.Group space={2}>
+                  <Button.Group space={8}flexDirection="row" justifyContent="center">
                     <Button variant="unstyled" colorScheme="coolGray" onPress={onClose} ref={cancelRef}>
                       Back
                     </Button>
-                    <Button colorScheme="emerald" onPress={onContinue}>
-                      Continue
+                    <Button style = {alertbuttons} onPress={onContinue}>Continue
                     </Button>
                   </Button.Group>
                 </AlertDialog.Footer>
