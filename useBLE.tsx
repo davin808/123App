@@ -110,6 +110,7 @@ export default function useBLE(): BluetoothLowEnergyApi{
             const deviceConnection = await bleManager.connectToDevice(device.id);
             setCurrentDevice(deviceConnection);
             await deviceConnection.discoverAllServicesAndCharacteristics();
+            //log services and characteristic for a service
             const services = await device.services();
             //console.log(services);
             const characteristics = await device.characteristicsForService('0000180a-0000-1000-8000-00805f9b34fb');
@@ -133,7 +134,9 @@ export default function useBLE(): BluetoothLowEnergyApi{
             
             if (device && (device.name?.includes("Arduino") ||
             device.localName?.includes("DavinBLE"))) {
-                allDevices[0] = device;
+                const allDevicenew = [];
+                allDevicenew[0] = device;
+                setAllDevices(allDevicenew);  //update allDevice state
                 setCurrentDevice(device);
                 console.log("Found in scan",allDevices[0].name, device.localName);
                 bleManager.stopDeviceScan();
@@ -178,7 +181,8 @@ export default function useBLE(): BluetoothLowEnergyApi{
                 device.id,
                 '0000180a-0000-1000-8000-00805f9b34fb',  // service uuid
                 '00002a57-0000-1000-8000-00805f9b34fb',  //characteristic
-                btoa("01")
+                btoa("01")     //string to base64 data to write
+                
             );
           } catch (e) {
             console.log(e);
