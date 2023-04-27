@@ -1,14 +1,12 @@
 import React from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import { Button, Box, Center, Text , AlertDialog} from "native-base";
-import useBLE from './useBLE';
+import {UseBLEHOOK} from './useBLE';
 import {BleManager, Device, NativeDevice} from 'react-native-ble-plx';
 import { SafeAreaView} from 'react-native';
 import {useState, useRef} from 'react';
 import{useNavigation} from "@react-navigation/native"
 import deviceInfoModule from 'react-native-device-info';
-
-
 
 
 // const styles = StyleSheet.create({
@@ -37,7 +35,8 @@ const Scanning = () => {
 
     const [connect, setConnect] = useState("Not Connected")
     const [calibrate, setCalibrate] = useState("Not Calibrated")
-    const {writeData, disconnectFromDevice, allDevices} = useBLE();
+    const {writeData, disconnectFromDevice, allDevices, currentDevice} = UseBLEHOOK();
+
     //typeof allDevices[0] !== 'undefined'
     // const startScan = () => {
     //     requestPermissions(isGranted => {
@@ -108,8 +107,9 @@ const Scanning = () => {
 
     const cancelRef = useRef(null);
 
-    const openDC = () => {
-      disconnectFromDevice();
+    const openDC = async() => {
+      await disconnectFromDevice();
+      
       console.log("successfuly disconnected");
     }
 
@@ -154,13 +154,17 @@ const Scanning = () => {
             {/* <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Disconnect Your BLE Device</Text> */}
             <Button size="lg" onPress={openDC} style = {buttondiyaStyle}>DISCONNECT</Button>
             
-            {allDevices.map((device: Device) => (
+            {/* {allDevices.map((device: Device) => (
                 <Text fontSize="md" color={'blue.900'}>Connected Device: {device.name}</Text>
-            ))}
+            ))} */}
+
+            <Text>
+              {currentDevice?.name}
+            </Text>
 
             {/* <Text fontSize="md" color={'blue.900'}>Connected Device: {allDevices[0].name}</Text> */}
 
-            <Button size="lg" onPress={() => writeData(allDevices[0])} style = {{marginBottom:10}}>Send 1</Button>
+            <Button size="lg" onPress={() => writeData()} style = {{marginBottom:10}}>Send 1 to </Button>
             
 
             <Button size="lg" style = {buttondiyaStyle} onPress={() => setIsOpen(!isOpen)}>START EXCERCISE</Button>

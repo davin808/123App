@@ -1,7 +1,7 @@
 import React from 'react'
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import { Button, Box, Center, Text, Heading } from "native-base";
-import useBLE from './useBLE';
+import {UseBLEHOOK} from './useBLE';
 import {BleManager, Device,} from 'react-native-ble-plx';
 import { SafeAreaView} from 'react-native';
 import {useState} from 'react';
@@ -9,10 +9,10 @@ import{useNavigation} from "@react-navigation/native"
 
 
 export default function Scancomp() {
-    const {requestPermissions, scanForDevices, allDevices, writeData} = useBLE();
+    const {requestPermissions, scanForDevices, allDevices, writeData,currentDevice} = UseBLEHOOK();
 
     const openModal = async () => {
-        requestPermissions(isGranted => {
+        await requestPermissions(isGranted => {
           if (isGranted) {
             console.log("granted");
             scanForDevices();
@@ -32,10 +32,31 @@ export default function Scancomp() {
     <SafeAreaView>
         <Box alignItems="center">
             <Heading size="md" style = {{marginTop: 30}}>Devices Found</Heading>
-            {allDevices.map((device: Device) => (
-                <Text fontSize="md" color={'blue.900'}>{device.name}</Text>
-            ))}
+            {/* {currentDevice.map((device: Device) => (
+                <Text fontSize="md" color={'blue.900'}>{currentDevice.name}</Text>
+            ))} */}
+           
+            
+          
+          {(() => {
+            if (currentDevice != null) {
+              return (
+                <Text>{currentDevice.name}</Text>
+              )
+            } else if (currentDevice == null) {
+              return (
+                <Text>Nothing Connected</Text>
+              )
+            } else {
+              return (
+                <Text>catch all</Text>
+              )
+            }
+          })()}
 
+          
+            
+            
             <Button size="lg" onPress={openModal} style = {{marginTop: 30}}>Scan</Button>
                 
         

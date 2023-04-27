@@ -1,65 +1,60 @@
 import {PermissionsAndroid, Platform} from 'react-native';
 import {BleManager, Device,BleError, Characteristic} from 'react-native-ble-plx';
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { getDeviceSync } from 'react-native-device-info';
 import DeviceInfo from 'react-native-device-info';
 import {PERMISSIONS, RESULTS, requestMultiple} from 'react-native-permissions';
 import { atob, btoa } from 'react-native-quick-base64';
 
 
-
 // request permissions in android
 type VoidCallback =  (result: boolean) => void;
-
-const bleManager = new BleManager();
 
 
 const pi_UUID = '0000';
 const pi_CHARACTERISTIC = '00002a57-0000-1000-8000-00805f9b34fb';
 const pi_SERVICE = '0000180a-0000-1000-8000-00805f9b34fb';
 const datatoWrite = btoa("01");
-
-
-interface BluetoothLowEnergyApi {
-    requestPermissions(cb: VoidCallback): Promise<void>; // request permisison for refined location
-    connectToDevice(device: Device): Promise<void>;// method for connecting
-    scanForDevices(): void; // interface for scan for devices
-    writeData(device: Device): Promise<void>; // interface for writing to device
-    currentDevice: Device | null;
-    allDevices: Device[]; // devices state array of device structs
-    disconnectFromDevice: () => void;
-    command: number;
-
-}
-
-export interface CMD {
-    opCode: BigInt;
-    commandData: BigInt;
-  }
-  
-
-export enum COMMAND_TYPE {  // use to decypher command type
-    CALIBRATE = 1,  // send command?
-    WORKOUT = 2,    // hearing response?
-}
+let deviceID = '';
 
 
 
-//hook
-export default function useBLE(): BluetoothLowEnergyApi{
+export function UseBLEHOOK() {
+    const bleManager = new BleManager();
     //create state that will hold all devices in a array found on scan. 
     const [allDevices, setAllDevices] = useState<Device[]>([]);
-    const [currentDevice, setCurrentDevice] = useState<Device | null>(null);
+    const [currentDevice, setCurrentDevice] = (useState<Device | null>(null));
+    const [connectedDevice, setConnectedDevice] = (useState<Device | null>(null));
     const [command, setcommand] = useState<number>(0);
-
+    const [isConnected, setIsConnected] = useState(false);
     
 
+    useEffect(() => {
+        const connect = async() => {
+            await connectToDevice();
+        }
+        if(currentDevice != null && connectedDevice == null){
+            console.log("running the connect funciton");
+            connect();
+        }else if (currentDevice != null && connectedDevice != null){
+            console.log("set connected device");
+        }else if(currentDevice == null){
+            console.log("current device went null");
+        }else if(connectedDevice == null){
+            console.log("connected device went null");
+        }
+        
+        
+    }, [currentDevice, connectedDevice])
+    
+
+    
     // request permission from user
     const requestPermissions = async (cb: VoidCallback) => {
         //check os
         if (Platform.OS === 'android') {
-          const apiLevel = await DeviceInfo.getApiLevel();
-    
+            const apiLevel = await DeviceInfo.getApiLevel();
+
             if (apiLevel < 31) { // less than android 12
                 // request for a status for location permission on android
                 const granted = await PermissionsAndroid.request(
@@ -81,7 +76,7 @@ export default function useBLE(): BluetoothLowEnergyApi{
                     PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
                     //   PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION,
                 ]);
-    
+
                 const isGranted =
                     result['android.permission.BLUETOOTH_CONNECT'] ===
                         PermissionsAndroid.RESULTS.GRANTED &&
@@ -105,24 +100,6 @@ export default function useBLE(): BluetoothLowEnergyApi{
         devices.findIndex(device => nextDevice.id === device.id) > -1;
 
 
-    const connectToDevice = async (device: Device) => {
-        try{
-            const deviceConnection = await bleManager.connectToDevice(device.id);
-            setCurrentDevice(deviceConnection);
-            await deviceConnection.discoverAllServicesAndCharacteristics();
-            //log services and characteristic for a service
-            const services = await device.services();
-            //console.log(services);
-            const characteristics = await device.characteristicsForService('0000180a-0000-1000-8000-00805f9b34fb');
-            console.log(characteristics)
-            //startStreamingData(deviceConnection);
-            console.log('connected');
-            writeData(allDevices[0]);
-        } catch (error1) {
-            console.log('failed to connect', error1);
-        }
-    };
-
     const scanForDevices = () => {
         console.log("outside");
         bleManager.startDeviceScan(null, null, (error, device) => {
@@ -134,97 +111,90 @@ export default function useBLE(): BluetoothLowEnergyApi{
             
             if (device && (device.name?.includes("Arduino") ||
             device.localName?.includes("DavinBLE"))) {
-                const allDevicenew = [];
-                allDevicenew[0] = device;
-                setAllDevices(allDevicenew);  //update allDevice state
+                // const allDevicenew = [];
+                // allDevicenew[0] = device;
+                // setAllDevices(allDevicenew);  //update allDevice state
                 setCurrentDevice(device);
-                console.log("Found in scan",allDevices[0].name, device.localName);
+                //console.log("Found in scan",allDevices[0].name, device.localName);
                 bleManager.stopDeviceScan();
-                connectToDevice(device);
+                deviceID = device.id;
+                
                 console.log('after connect call')
-
                 return(null);
-                // setAllDevices(prevState => {
-                //   if (!isDuplicateDevice(prevState, device)) {
-                //     return [...prevState, device];
-                //   }
-                //   return prevState;
-                // });
             }
         });
-        console.log("end");
 
     }
 
-    
+    const connectToDevice = async () => {
+        try {
+            const device = await bleManager.connectToDevice(currentDevice!.id);
+            
+            await device.discoverAllServicesAndCharacteristics();
 
-    const disconnectFromDevice = () => {
-        if(currentDevice) {  // if status to connected device is not null
-            bleManager.cancelDeviceConnection(allDevices[0].id);  // stop connection
-            setCurrentDevice(null);   //change status to null
-            // setcommand(0);  //reset command
+            console.log("connected to id below");
+            console.log(currentDevice!.id);
+            console.log(device!.id);
+            
+            setConnectedDevice(currentDevice);
+            // const services = await device.services();
+            
+            
+            // const characteristics = await device.characteristicsForService('0000180a-0000-1000-8000-00805f9b34fb');
+            // console.log(characteristics);
+            setIsConnected(true);
+
+            // for some reason device is only connected here when back out to home connected devices go low
+            await writeData();
+
+        } catch (error) {
+            console.log('Error connecting to device:', error);
         }
     };
 
-    // const startStreamingData = async (device: Device) => {
-    //     if(device){ // if device conneced start listening for data
-    //         device.monitorCharacteristicForService(pi_UUID,pi_CHARACTERISTIC,() => {});
-    //     }else { // no current device
-    //         console.error('NO Device Connected'); 
-    //     }
-    // };
-
-    const writeData = async (device: Device) => {
+    const disconnectFromDevice = async () => {
         try {
-            console.log(device.id);
+            
+            console.log('current id disc from');
+            console.log(currentDevice!.id);
+            console.log(connectedDevice!.id);
+            await bleManager.cancelDeviceConnection(currentDevice!.id);
+
+            await connectedDevice!.cancelConnection();
+
+            setIsConnected(false);
+            
+            
+        } catch (error) {
+            console.log('Error disconnecting from device:', error);
+        }
+    };
+
+
+
+    const writeData =  async() => {
+        try {
+            //console.log(connectedDevice!.id);
+            //console.log(device!.id);
+            
+            const dev = await currentDevice!.connect();
+            await dev.discoverAllServicesAndCharacteristics();
             await bleManager.writeCharacteristicWithResponseForDevice(
-                device.id,
+                dev!.id,
                 '0000180a-0000-1000-8000-00805f9b34fb',  // service uuid
                 '00002a57-0000-1000-8000-00805f9b34fb',  //characteristic
                 btoa("01")     //string to base64 data to write
                 
             );
           } catch (e) {
-            console.log(e);
+            console.log('Error when Writing',e);
           }
-        console.log("Found in write function",allDevices[0].name, device.localName);
-        // if (typeof(allDevices[0]) != 'undefined'){
-        //     console.log('defined');
-        //     allDevices[0].writeCharacteristicWithoutResponseForService(
-        //         '0000180A-0000-1000-8000-00805F9B34FB',
-        //         '00002A57-0000-1000-8000-00805F9B34FB',
-        //         btoa("AQ==")
-        //     )
-        //     bleManager.writeCharacteristicWithoutResponseForDevice(
-        //         allDevices[0].id,
-        //         '0000180A-0000-1000-8000-00805F9B34FB',
-        //         '00002A57-0000-1000-8000-00805F9B34FB',
-        //         btoa("01")
-        //     )
-        //     console.log("finish write");
-        // }else{
-        //     console.log('undefined');
-        // }
 
-        //typeof device !== 'undefined'
-    };
+
         
-    //const onCommandUpdate = (  // on update read data
-    //     error: BleError | null,
-    //     characteristic: Characteristic | null
-    // ) => {
-    //     if(error) {
-    //         console.error(error);
-    //         return;
-    //     }else if(!characteristic?.value) {
-    //         console.error("No Characteristic Found");
-    //         return;
-    //     }
-    //     const rawData = atob(characteristic.value);  
-    //     const firstBit: number = Number(rawData) & 0x01;   //get first bit of data. can be used like a sign bit for commmand type
-    // }
+        // console.log("Found in write function",allDevices[0].name, allDevices[0].localName);
+    };
 
-    
     return {
         requestPermissions, 
         scanForDevices,
