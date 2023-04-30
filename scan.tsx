@@ -5,7 +5,8 @@ import {UseBLEHOOK} from './useBLE';
 import {BleManager, Device,} from 'react-native-ble-plx';
 import { SafeAreaView} from 'react-native';
 import {useState} from 'react';
-import{useNavigation} from "@react-navigation/native"
+import{useNavigation} from "@react-navigation/native";
+import {d} from './useBLE';
 
 
 export default function Scancomp() {
@@ -39,11 +40,11 @@ export default function Scancomp() {
             
           
           {(() => {
-            if (currentDevice != null) {
+            if (d != null) {
               return (
-                <Text>{currentDevice.name}</Text>
+                <Text>{d.name}</Text>
               )
-            } else if (currentDevice == null) {
+            } else if (d == null) {
               return (
                 <Text>Nothing Connected</Text>
               )

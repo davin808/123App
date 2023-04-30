@@ -7,7 +7,7 @@ import { SafeAreaView} from 'react-native';
 import {useState, useRef} from 'react';
 import{useNavigation} from "@react-navigation/native"
 import deviceInfoModule from 'react-native-device-info';
-
+import {d} from './useBLE';
 
 // const styles = StyleSheet.create({
 //     one: {
@@ -158,9 +158,9 @@ const Scanning = () => {
                 <Text fontSize="md" color={'blue.900'}>Connected Device: {device.name}</Text>
             ))} */}
 
-            <Text>
-              {currentDevice?.name}
-            </Text>
+            {/* <Text>
+              {d?.name}
+            </Text> */}
 
             {/* <Text fontSize="md" color={'blue.900'}>Connected Device: {allDevices[0].name}</Text> */}
 

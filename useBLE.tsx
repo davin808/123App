@@ -1,10 +1,11 @@
 import {PermissionsAndroid, Platform} from 'react-native';
-import {BleManager, Device,BleError, Characteristic} from 'react-native-ble-plx';
+import {BleManager, Device,BleError, Characteristic, NativeDevice} from 'react-native-ble-plx';
 import { useState, useEffect} from 'react';
 import { getDeviceSync } from 'react-native-device-info';
 import DeviceInfo from 'react-native-device-info';
 import {PERMISSIONS, RESULTS, requestMultiple} from 'react-native-permissions';
 import { atob, btoa } from 'react-native-quick-base64';
+import { parsePackageNameFromAndroidManifestFile } from '@react-native-community/cli-platform-android/build/config/getAndroidProject';
 
 
 // request permissions in android
@@ -17,6 +18,9 @@ const pi_SERVICE = '0000180a-0000-1000-8000-00805f9b34fb';
 const datatoWrite = btoa("01");
 let deviceID = '';
 
+export let d: Device;
+
+let count = 0;
 
 
 export function UseBLEHOOK() {
@@ -32,20 +36,22 @@ export function UseBLEHOOK() {
     useEffect(() => {
         const connect = async() => {
             await connectToDevice();
+            // await d.discoverAllServicesAndCharacteristics();
         }
-        if(currentDevice != null && connectedDevice == null){
+
+        if(currentDevice != null){
             console.log("running the connect funciton");
             connect();
-        }else if (currentDevice != null && connectedDevice != null){
-            console.log("set connected device");
         }else if(currentDevice == null){
             console.log("current device went null");
-        }else if(connectedDevice == null){
-            console.log("connected device went null");
+        }else{
+            console.log("Use effect called");
         }
+
         
         
-    }, [currentDevice, connectedDevice])
+        
+    }, [currentDevice])
     
 
     
@@ -119,6 +125,7 @@ export function UseBLEHOOK() {
                 bleManager.stopDeviceScan();
                 deviceID = device.id;
                 
+
                 console.log('after connect call')
                 return(null);
             }
@@ -128,24 +135,25 @@ export function UseBLEHOOK() {
 
     const connectToDevice = async () => {
         try {
-            const device = await bleManager.connectToDevice(currentDevice!.id);
-            
-            await device.discoverAllServicesAndCharacteristics();
-
+            d= await bleManager.connectToDevice(currentDevice!.id);
+            // d = await currentDevice!.connect();
+            await d.discoverAllServicesAndCharacteristics();
+            console.log("discovered services and characteristics");
             console.log("connected to id below");
-            console.log(currentDevice!.id);
-            console.log(device!.id);
+            console.log(d!.id);
+            console.log(d!.id);
             
-            setConnectedDevice(currentDevice);
+            setConnectedDevice(d);
             // const services = await device.services();
             
             
             // const characteristics = await device.characteristicsForService('0000180a-0000-1000-8000-00805f9b34fb');
             // console.log(characteristics);
-            setIsConnected(true);
-
+            
+            
+            
             // for some reason device is only connected here when back out to home connected devices go low
-            await writeData();
+            //await writeData();
 
         } catch (error) {
             console.log('Error connecting to device:', error);
@@ -171,16 +179,26 @@ export function UseBLEHOOK() {
     };
 
 
-
+    
     const writeData =  async() => {
         try {
             //console.log(connectedDevice!.id);
             //console.log(device!.id);
+
+            //count 2 because for somereason only after connecting twice it connects after pressing send 1
+            if(count < 2){
+                console.log('second connect', count);
+                
+                const dev = await d!.connect();
+                await dev.discoverAllServicesAndCharacteristics();
+               
+                setIsConnected(true);
+                count += 1;
+                
+            }
             
-            const dev = await currentDevice!.connect();
-            await dev.discoverAllServicesAndCharacteristics();
             await bleManager.writeCharacteristicWithResponseForDevice(
-                dev!.id,
+                d!.id,
                 '0000180a-0000-1000-8000-00805f9b34fb',  // service uuid
                 '00002a57-0000-1000-8000-00805f9b34fb',  //characteristic
                 btoa("01")     //string to base64 data to write
@@ -189,6 +207,7 @@ export function UseBLEHOOK() {
           } catch (e) {
             console.log('Error when Writing',e);
           }
+          
 
 
         
