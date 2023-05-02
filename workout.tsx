@@ -8,6 +8,9 @@ import{useNavigation} from "@react-navigation/native"
 import ChooseComp from "./chooseWorkout"
 import { RouteProp } from '@react-navigation/native';
 import {RootStackParamList}  from './chooseWorkout';
+import {d} from './useBLE';
+import {UseBLEHOOK} from './useBLE';
+import { atob, btoa } from 'react-native-quick-base64';
 
 // type ChildProps = {
 //     reps: number;
@@ -25,6 +28,7 @@ type Props = {
 
 const WorkoutComp = ({ route }: Props) => {
   const { data } = route.params;
+  const {writeData, disconnectFromDevice, allDevices, currentDevice, readData} = UseBLEHOOK();
 
   const exerciseData = {
     bad: 0,
@@ -32,8 +36,18 @@ const WorkoutComp = ({ route }: Props) => {
     score: 0,
   };
 
+  //iphone commands
+  //0x01 = start   0x00 = stop      0x02 = start rep     
+
+  //both
+  //0xFF = ACK
+
+
+  //arduino commands
+  //0x03 == rep finished   //0x10 keyframe 1 hit     //0x20 keyframe 2 hit      //0x30 keyframe 3 hit       //0x40 keyframe 4 hit
   const beginExercise =() => {
-    // send start flag to pi
+    // send start flag to pi send 0x01
+    writeData(btoa("01"));
 
     //if successful start, begin else, alert error
 

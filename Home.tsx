@@ -8,6 +8,7 @@ import {useState, useRef} from 'react';
 import{useNavigation} from "@react-navigation/native"
 import deviceInfoModule from 'react-native-device-info';
 import {d} from './useBLE';
+import { atob, btoa } from 'react-native-quick-base64';
 
 // const styles = StyleSheet.create({
 //     one: {
@@ -35,7 +36,7 @@ const Scanning = () => {
 
     const [connect, setConnect] = useState("Not Connected")
     const [calibrate, setCalibrate] = useState("Not Calibrated")
-    const {writeData, disconnectFromDevice, allDevices, currentDevice} = UseBLEHOOK();
+    const {writeData, disconnectFromDevice, allDevices, currentDevice, readData} = UseBLEHOOK();
 
     //typeof allDevices[0] !== 'undefined'
     // const startScan = () => {
@@ -164,7 +165,9 @@ const Scanning = () => {
 
             {/* <Text fontSize="md" color={'blue.900'}>Connected Device: {allDevices[0].name}</Text> */}
 
-            <Button size="lg" onPress={() => writeData()} style = {{marginBottom:10}}>Send 1 to </Button>
+            <Button size="lg" onPress={() => writeData(btoa("01"))} style = {{marginBottom:10}}>Send 1 to </Button>
+
+            <Button size="lg" onPress={() => readData()} style = {{marginBottom:10}}>Read value 10 from device </Button>
             
 
             <Button size="lg" style = {buttondiyaStyle} onPress={() => setIsOpen(!isOpen)}>START EXCERCISE</Button>

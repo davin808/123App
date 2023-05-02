@@ -19,9 +19,11 @@ const datatoWrite = btoa("01");
 let deviceID = '';
 
 export let d: Device;
+export let v: string;
 
-let count = 0;
 
+let i = 0;   //counter for write and read
+// let j = 0;      // coutner for read
 
 export function UseBLEHOOK() {
     const bleManager = new BleManager();
@@ -180,30 +182,73 @@ export function UseBLEHOOK() {
 
 
     
-    const writeData =  async() => {
+    const writeData =  async(value: string) => {
         try {
             //console.log(connectedDevice!.id);
             //console.log(device!.id);
 
             //count 2 because for somereason only after connecting twice it connects after pressing send 1
-            if(count < 2){
-                console.log('second connect', count);
+            for (i ; i < 3; i++){
+                console.log('second connect', i);
                 
                 const dev = await d!.connect();
                 await dev.discoverAllServicesAndCharacteristics();
                
                 setIsConnected(true);
-                count += 1;
                 
             }
-            
+
             await bleManager.writeCharacteristicWithResponseForDevice(
                 d!.id,
                 '0000180a-0000-1000-8000-00805f9b34fb',  // service uuid
                 '00002a57-0000-1000-8000-00805f9b34fb',  //characteristic
-                btoa("01")     //string to base64 data to write
+                value     //string to base64 data to write
                 
             );
+            console.log("successfully wrote:", value);
+            
+          } catch (e) {
+            console.log('Error when Writing',e);
+          }
+          
+
+
+        
+        // console.log("Found in write function",allDevices[0].name, allDevices[0].localName);
+    };
+    
+    
+    const readData =  async() => {
+        try {
+            //console.log(connectedDevice!.id);
+            //console.log(device!.id);
+
+            //count 2 because for somereason only after connecting twice it connects after pressing send 1
+            for (i; i < 3 ; i++){
+                console.log('second connect', i);
+                
+                const dev = await d!.connect();
+                await dev.discoverAllServicesAndCharacteristics();
+               
+                setIsConnected(true);
+                d.monitorCharacteristicForService(
+                    '0000180a-0000-1000-8000-00805f9b34fb',
+                    '00002a57-0000-1000-8000-00805f9b34fb',
+                    (error, characteristic) => valueUpdate(error, characteristic),
+                );    
+            }
+            console.log("successfully read");
+            
+            
+            
+            
+
+            
+        //     await bleManager.readCharacteristicForDevice(
+        //         d!.id,
+        //         '0000180a-0000-1000-8000-00805f9b34fb',  // service uuid
+        //         '00002a57-0000-1000-8000-00805f9b34fb'  //characteristic         
+        //     );
           } catch (e) {
             console.log('Error when Writing',e);
           }
@@ -214,6 +259,40 @@ export function UseBLEHOOK() {
         // console.log("Found in write function",allDevices[0].name, allDevices[0].localName);
     };
 
+    const valueUpdate = (
+        error: BleError | null,
+        characteristic: Characteristic | null,
+      ) => {
+        
+        if (error) {
+          console.log(error);
+          return -1;
+        } else if (!characteristic?.value) {
+          console.log('No Data was recieved');
+          return -1;
+        }
+
+        const byteCharacters = atob(characteristic.value);
+
+        const byteNumbers = new Array(byteCharacters.length);
+
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+
+        // Convert byte array to hex string
+        const hexString = Array.from(byteArray)
+        .map((byte) => {
+            return ('0' + byte.toString(16)).slice(-2);
+        })
+        .join('');
+
+        console.log("value: ", hexString);
+
+    }
+
+
     return {
         requestPermissions, 
         scanForDevices,
@@ -223,5 +302,7 @@ export function UseBLEHOOK() {
         disconnectFromDevice,
         writeData,
         command,
+        readData, 
+        valueUpdate
     };
 }
