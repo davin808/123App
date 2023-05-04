@@ -44,7 +44,7 @@ function App(): JSX.Element {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NativeBaseProvider>
         <NavigationContainer>
-          <Text style= {{paddingTop: 10, paddingBottom:10, alignSelf:'center', fontSize:30, fontStyle:'italic'}}>MOCOPI Exercise App</Text>
+          {/* <Text style= {{paddingTop: 10, paddingBottom:10, alignSelf:'center', fontSize:30, fontStyle:'italic'}}>MOCOPI Exercise App</Text> */}
           <Stack.Navigator screenOptions={{headerTintColor:'black', headerStyle: { backgroundColor: 'white' }}}>
             <Stack.Screen name ="Home" component = {Scanning} ></Stack.Screen>
               {/* <View style={styles.container}>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Box, Center, Text, Heading, AlertDialog, AspectRatio, Stack, HStack, View, } from "native-base";
-import { SafeAreaView, Image, TouchableHighlight} from 'react-native';
+import { ScrollView, SafeAreaView, Image, TouchableHighlight} from 'react-native';
 import {useState, useRef} from 'react';
 import babelConfig from './babel.config';
 import{useNavigation} from "@react-navigation/native"
@@ -61,45 +61,44 @@ export default function ChooseComp({ navigationProp }: Props) {
   return (
     <View> 
       <SafeAreaView>
-          <Heading alignSelf= "center" size="2xl" style = {{marginTop:50, marginBottom:50}}>Choose a Workout</Heading>
-          <TouchableHighlight  onPress={() => {setIsOpen(!isOpen); setEname('Bicep Curl');}}>
-            <Image borderRadius={100} source={require('./assets/bc.jpg')} style={{width: 200, height: 200, marginLeft:100}} />
-          </TouchableHighlight>
+          <ScrollView>
+            <Heading alignSelf= "center" size="2xl" style = {{marginTop:"auto", marginBottom:"auto"}}>Choose a Workout</Heading>
+            <TouchableHighlight  onPress={() => {setIsOpen(!isOpen); setEname('Bicep Curl');}}>
+              <Image borderRadius={100} source={require('./assets/bc.jpg')} style={{width: 200, height: 200, marginLeft:"auto", marginRight:"auto", marginTop: 50}} />
+            </TouchableHighlight>
 
-          <TouchableHighlight  onPress={() => {setEname('Squat'); setIsOpen(!isOpen);}}>
-            <Image borderRadius={100} source={require('./assets/sq.jpg')} style={{width: 200, height: 200, marginLeft:100, marginTop: 100}} />
-          </TouchableHighlight>
+            <TouchableHighlight  onPress={() => {setEname('Squat'); setIsOpen(!isOpen);}}>
+              <Image borderRadius={100} source={require('./assets/sq.jpg')} style={{width: 200, height: 200, marginLeft:"auto", marginRight:"auto", marginTop: 100}} />
+            </TouchableHighlight>
 
 
 
-          <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
-                <AlertDialog.Content>
-                  <AlertDialog.CloseButton />
-                  <AlertDialog.Header>One More Step</AlertDialog.Header>
-                  <AlertDialog.Body>
-                    Choose Number of Reps for Your Exercise
-                  </AlertDialog.Body>
-                  <AlertDialog.Footer>
-                    <Button.Group space={2}>
-                      {/* <Slider w="3/4" maxW="300" defaultValue={5} minValue={0} maxValue={10} accessibilityLabel="Select Reps" step={1}>
-                          <Slider.Track>
-                            <Slider.FilledTrack />
-                          </Slider.Track>
-                        <Slider.Thumb />
-                      </Slider> */}
-                      <Button colorScheme="emerald" onPress={fiveRep}>
-                        5
-                      </Button>
-                      <Button colorScheme="emerald" onPress={tenRep}>
-                        10
-                      </Button>
-                    </Button.Group>
-                  </AlertDialog.Footer>
-                </AlertDialog.Content>
-            </AlertDialog>
-
-            
-
+            <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
+                  <AlertDialog.Content>
+                    <AlertDialog.CloseButton />
+                    <AlertDialog.Header>One More Step</AlertDialog.Header>
+                    <AlertDialog.Body>
+                      Choose Number of Reps for Your Exercise
+                    </AlertDialog.Body>
+                    <AlertDialog.Footer>
+                      <Button.Group space={2}>
+                        {/* <Slider w="3/4" maxW="300" defaultValue={5} minValue={0} maxValue={10} accessibilityLabel="Select Reps" step={1}>
+                            <Slider.Track>
+                              <Slider.FilledTrack />
+                            </Slider.Track>
+                          <Slider.Thumb />
+                        </Slider> */}
+                        <Button colorScheme="emerald" onPress={fiveRep}>
+                          5
+                        </Button>
+                        <Button colorScheme="emerald" onPress={tenRep}>
+                          10
+                        </Button>
+                      </Button.Group>
+                    </AlertDialog.Footer>
+                  </AlertDialog.Content>
+              </AlertDialog>
+            </ScrollView>
       </SafeAreaView>
       {/* <Text style = {{marginBottom:50000}}></Text> */}
       {/* <WorkoutComp reps={reps}/> */}

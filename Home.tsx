@@ -34,7 +34,7 @@ const Scanning = () => {
     // const nativedum = new nativeDevice();
     // const dummy = new Device(dummyman);
 
-    const [connect, setConnect] = useState("Not Connected")
+    const [connect, setConnect] = useState("Not Connected\n")
     const [calibrate, setCalibrate] = useState("Not Calibrated")
     const {writeData, disconnectFromDevice, allDevices, currentDevice, readData} = UseBLEHOOK();
 
@@ -131,12 +131,15 @@ const Scanning = () => {
       borderRadius: 10,
       justifyContent: 'center',
       alignItems: 'center',
-      marginBottom: 100,
+      marginBottom: 75,
     };
 
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'flex-end' }}>
-          <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">       {connect}                      {calibrate}</Text>
+          <Text style = {{marginBottom:"auto", marginTop:"auto", textAlign:"center"}} fontSize="lg">
+            {connect}
+            {calibrate}
+          </Text>
           <Box alignItems="center">
 
             {/* <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Connect to Scan For BLE Devices!</Text> */}
@@ -178,15 +181,12 @@ const Scanning = () => {
                 <AlertDialog.Body>
                   Please double check that the device is connected and calibrated.
                 </AlertDialog.Body>
-                <AlertDialog.Footer>
-                  <Button.Group space={8}flexDirection="row" justifyContent="center">
-                    <Button variant="unstyled" colorScheme="coolGray" onPress={onClose} ref={cancelRef}>
-                      Back
-                    </Button>
-                    <Button style = {alertbuttons} onPress={onContinue}>Continue
-                    </Button>
-                  </Button.Group>
+                <AlertDialog.Footer justifyContent="center">
+                  <Button style={{alertbuttons, backgroundColor: '#1a7045'}} size="lg" onPress={onContinue}>Continue</Button>
                 </AlertDialog.Footer>
+                <Button variant="unstyled" colorScheme="coolGray" onPress={onClose} ref={cancelRef}>
+                  Back
+                </Button>
               </AlertDialog.Content>
             </AlertDialog>
 

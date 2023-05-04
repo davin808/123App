@@ -17,7 +17,7 @@ const Calibrationcomp = () => {
     }
   return (
     <SafeAreaView>
-        <Heading size="2xl" style = {{marginTop:50, marginBottom:50}}>Calibration in Progress</Heading>
+        <Heading size="2xl" style = {{marginTop:100, marginBottom:"auto", marginLeft:"auto", marginRight:"auto", textAlign:"center"}}>Calibration in Progress</Heading>
         
         {complete
             ? <Center> <CheckIcon size="5" mt="0.5" color="emerald.500" /> </Center>
