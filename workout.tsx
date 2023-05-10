@@ -104,6 +104,97 @@ const WorkoutComp = ({ route }: Props) => {
 
   //arduino commands
   //0x03 == rep finished   //0x10 keyframe 1 hit     //0x20 keyframe 2 hit      //0x30 keyframe 3 hit       //0x40 keyframe 4 hit
+  // Wrote pseudocode to do beginexercise kinda incorrect
+  const NajelbeginExercise = () => {
+    // send start flag to pi send 0x01
+    writeData(btoa('01'));
+  
+    // setimageNum(2);  //initialize first key frame or introduction picture?
+    setimgSrc(require('./assets/step2.png'));
+    setexStart(true);
+  
+    let r = data.reps;
+  
+    for (let i = 0; i < r; i++) {
+      // send to pi look for kf 1 & update image to kf 1
+      writeData(btoa('look_for_kf1'));
+      setimgSrc(require('./assets/step1.png'));
+  
+      // wait for kf 1 result
+      let result = waitForKfResult();
+  
+      if (!result) {
+        // if read kf missed start from top of for loop (reset rep).
+        // have 3 sec timer to let patient ready to get ready & show incorrect image
+        resetRep();
+        setimgSrc(require('./assets/incorrect.png'));
+        continue;
+      }
+  
+      // send to pi look for kf 2 & update image to kf 2
+      writeData(btoa('look_for_kf2'));
+      setimgSrc(require('./assets/step2.png'));
+  
+      // wait for kf 2 result & update image to kf 2
+      result = waitForKfResult();
+  
+      if (!result) {
+        // if read kf missed start from top of for loop (reset rep).
+        // have 3 sec timer to let patient ready to get ready & show incorrect image
+        resetRep();
+        setimgSrc(require('./assets/incorrect.png'));
+        continue;
+      }
+  
+      // send to pi look for kf 3 & update image to kf 3
+      writeData(btoa('look_for_kf3'));
+      setimgSrc(require('./assets/step3.png'));
+  
+      // wait for kf 3 result
+      result = waitForKfResult();
+  
+      if (!result) {
+        // if read kf missed start from top of for loop (reset rep).
+        // have 3 sec timer to let patient ready to get ready & show incorrect image
+        resetRep();
+        setimgSrc(require('./assets/incorrect.png'));
+        continue;
+      }
+  
+      // send to pi look for kf 4 & update image to kf 4
+      writeData(btoa('look_for_kf4'));
+      setimgSrc(require('./assets/step4.png'));
+  
+      // wait for kf 4 result
+      result = waitForKfResult();
+  
+      if (!result) {
+        // if read kf missed start from top of for loop (reset rep).
+        // have 3 sec timer to let patient ready to get ready & show incorrect image
+        resetRep();
+        setimgSrc(require('./assets/incorrect.png'));
+        continue;
+      }
+  
+      console.log(`Rep ${i} completed`);
+      data.reps -= 1;
+    }
+  
+    console.log('Exercise completed');
+  
+    // read from pi
+    let bit = readFromPi();
+  
+    // if successful start, begin else, alert error
+    if (bit === 0x02) {
+      // wait for calculation of rep
+      let repResult = waitForRepCalculation();
+      // update data and exercise data
+      updateData(repResult);
+      updateExerciseData(repResult);
+    }
+  };
+  
   const beginExercise = () => {
 
     // send start flag to pi send 0x01
