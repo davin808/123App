@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import { Button, Box, Center, Text, Heading, Progress, HStack, Spinner, CheckIcon, AlertDialog} from "native-base";
 import useBLE from './useBLE';
 import { SafeAreaView, Image} from 'react-native';
@@ -237,6 +237,7 @@ const WorkoutComp = ({ route }: Props) => {
     
   return (
     <SafeAreaView>
+      <ScrollView>
         <Heading size="2xl" style = {{marginTop:50, marginBottom:50}}>Exercise: {data.name}</Heading>
         
         <Text>Reps to Go!: {data.reps}</Text>
@@ -257,26 +258,27 @@ const WorkoutComp = ({ route }: Props) => {
         
 
         {calcomplete
-            ? <Button colorScheme="emerald" onPress={beginExercise}> START </Button>
-            : <Button size="lg" onPress={() => setIsOpen(!isOpen)}> START </Button>
+            ? <Button style = {{marginLeft: "auto", marginRight: "auto"}} colorScheme="emerald" onPress={beginExercise}> START </Button>
+            : <Button style = {{marginLeft: "auto", marginRight: "auto"}} size="lg" onPress={() => setIsOpen(!isOpen)}> START </Button>
             
         }
 
         
         {exStart
-            ? <Image source={imgSrc} style={{width: 500, height: 500, resizeMode: 'contain', marginTop: 20}} />
+            ? <Image source={imgSrc} style={{width: 250, height: 500, marginTop: 20, marginLeft: "auto", marginRight: "auto"}} />
             : <Text></Text>
         }
 
         
         
 
-        <Button size="sm" onPress={() => setimgSrc(require('./assets/step3.png'))}> Other keyframe </Button>
-        <Button size="sm" onPress={handleButton}> Incorrect </Button>
+        <Button size="lg" style = {{marginLeft: "auto", marginRight: "auto"}} onPress={() => setimgSrc(require('./assets/step3.png'))}> Other keyframe </Button>
+        <Text></Text>
+        <Button size="lg" style = {{marginLeft: "auto", marginRight: "auto"}} onPress={handleButton}> Incorrect </Button>
 
 
         
-    
+      </ScrollView>
     </SafeAreaView>
   )
 
