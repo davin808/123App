@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import { Button, Box, Center, Text , AlertDialog, alertBu} from "native-base";
 import {UseBLEHOOK} from './useBLE';
 import {BleManager, Device, NativeDevice} from 'react-native-ble-plx';
@@ -140,6 +140,8 @@ const Scanning = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <Image source={require("./assets/title_card2.png")} style= {{width: 300,height: 200, marginTop: 20} } />
+           
           <Text style = {{marginBottom:"auto", marginTop:"auto", textAlign:"center"}} fontSize="lg">
             {connect}
             {calibrate}
