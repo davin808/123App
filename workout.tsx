@@ -110,7 +110,7 @@ const WorkoutComp = ({ route }: Props) => {
     writeData(btoa('01'));
 
     // setimageNum(2);  //initialize first key frame or introduction picture?
-    setimgSrc(require('./assets/step2.png'));
+    setimgSrc(require('./assets/step3.png'));
     setexStart(true);
     let r = data.reps
     for(let i = 0; i < r; i ++){

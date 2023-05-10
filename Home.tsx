@@ -34,8 +34,8 @@ const Scanning = () => {
     // const nativedum = new nativeDevice();
     // const dummy = new Device(dummyman);
 
-    const [connect, setConnect] = useState("Not Connected\n")
-    const [calibrate, setCalibrate] = useState("Not Calibrated")
+    const [connect, setConnect] = useState("\n")
+    const [calibrate, setCalibrate] = useState("\n")
     const {writeData, disconnectFromDevice, allDevices, currentDevice, readData, hexString} = UseBLEHOOK();
 
     //typeof allDevices[0] !== 'undefined'
@@ -140,12 +140,12 @@ const Scanning = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'flex-end' }}>
-          <Image source={require("./assets/title_card2.png")} style= {{width: 250,height: 120, marginTop: 20, marginLeft: "auto", marginRight: "auto"} } />
+          <Image source={require("./assets/title_card2.png")} style= {{width: 250,height: 240, marginTop: "auto", marginLeft: "auto", marginRight: "auto"} } />
            
-          <Text style = {{marginBottom:"auto", marginTop:"auto", textAlign:"center"}} fontSize="lg">
+          {/* <Text style = {{marginBottom:"auto", marginTop:"auto", textAlign:"center"}} fontSize="lg">
             {connect}
             {calibrate}
-          </Text>
+          </Text> */}
           <Box alignItems="center">
 
             {/* <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Connect to Scan For BLE Devices!</Text> */}
