@@ -108,16 +108,36 @@ const WorkoutComp = ({ route }: Props) => {
 
     // send start flag to pi send 0x01
     writeData(btoa('01'));
+
     // setimageNum(2);  //initialize first key frame or introduction picture?
     setimgSrc(require('./assets/step2.png'));
     setexStart(true);
     let r = data.reps
     for(let i = 0; i < r; i ++){
 
+      //send to pi look for kf 1  & update image to kf 1
+
       //wait for kf 1 result
 
+      //if read kf missed start from top of for loop (reset rep). have 3 sec timer to let patient ready to get ready & show incorrect image
 
-      // shouldnt data be sent kf by kf instead all at once to update pics accordingly
+      //send to pi look for kf 2
+
+      //wait for kf 2 result & update image to kf 2
+
+      //if read kf missed start from top of for loop (reset rep). have 3 sec timer to let patient ready to get ready & show incorrect image
+
+      //send to pi look for kf 3  & update image to kf 3
+
+      //wait for kf 3 result
+
+      //if read kf missed start from top of for loop (reset rep). have 3 sec timer to let patient ready to get ready& show incorrect image
+
+      //send to pi look for kf 4  & update image to kf 4
+
+      //wait for kf 4 result
+
+      //if read kf missed start from top of for loop (reset rep). have 3 sec timer to let patient ready to get ready & show incorrect image
 
     
     
