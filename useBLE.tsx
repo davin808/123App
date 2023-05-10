@@ -13,8 +13,13 @@ type VoidCallback =  (result: boolean) => void;
 
 
 const pi_UUID = '0000';
-const pi_CHARACTERISTIC = '00002a57-0000-1000-8000-00805f9b34fb';
-const pi_SERVICE = '0000180a-0000-1000-8000-00805f9b34fb';
+// const pi_CHARACTERISTIC = '00002a57-0000-1000-8000-00805f9b34fb';
+// const pi_SERVICE = '0000180a-0000-1000-8000-00805f9b34fb';
+
+const pi_SERVICE = '0c35e466-ad83-4651-88fa-0ff9d70fbf8c';
+const pi_CHARACTERISTIC = 'a59d3afb-5010-43f0-a241-1ad27e92d7b9';
+
+const EXERCISE_INFO_CHARACTERISTIC_UUID = "f75061a7-e391-4b61-ae4b-95812a2086e3";
 const datatoWrite = btoa("01");
 let deviceID = '';
 
@@ -33,7 +38,7 @@ export function UseBLEHOOK() {
     const [connectedDevice, setConnectedDevice] = (useState<Device | null>(null));
     const [command, setcommand] = useState<number>(0);
     const [isConnected, setIsConnected] = useState(false);
-    
+    const [hexString, sethexString] = useState('');
 
     useEffect(() => {
         const connect = async() => {
@@ -117,8 +122,7 @@ export function UseBLEHOOK() {
                 return; 
             }
             
-            if (device && (device.name?.includes("Arduino") ||
-            device.localName?.includes("DavinBLE"))) {
+            if (device && (device.localName?.includes("MoCopy (central)"))) {
                 // const allDevicenew = [];
                 // allDevicenew[0] = device;
                 // setAllDevices(allDevicenew);  //update allDevice state
@@ -188,7 +192,7 @@ export function UseBLEHOOK() {
             //console.log(device!.id);
 
             //count 2 because for somereason only after connecting twice it connects after pressing send 1
-            for (i ; i < 3; i++){
+            for (i ; i < 2; i++){
                 console.log('second connect', i);
                 
                 const dev = await d!.connect();
@@ -232,10 +236,12 @@ export function UseBLEHOOK() {
                
                 setIsConnected(true);
                 d.monitorCharacteristicForService(
-                    '0000180a-0000-1000-8000-00805f9b34fb',
-                    '00002a57-0000-1000-8000-00805f9b34fb',
+                    pi_SERVICE,
+                    pi_CHARACTERISTIC,
                     (error, characteristic) => valueUpdate(error, characteristic),
-                );    
+                );  
+                
+                
             }
             console.log("successfully read");
             
@@ -282,12 +288,14 @@ export function UseBLEHOOK() {
         const byteArray = new Uint8Array(byteNumbers);
 
         // Convert byte array to hex string
-        const hexString = Array.from(byteArray)
+        const hexString1 = Array.from(byteArray)
         .map((byte) => {
             return ('0' + byte.toString(16)).slice(-2);
         })
         .join('');
 
+        sethexString(hexString1);
+        
         console.log("value: ", hexString);
 
     }
@@ -303,6 +311,7 @@ export function UseBLEHOOK() {
         writeData,
         command,
         readData, 
-        valueUpdate
+        valueUpdate,
+        hexString
     };
 }

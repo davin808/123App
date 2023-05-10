@@ -1,10 +1,10 @@
 import React from 'react';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
-import { Button, Box, Center, Text , AlertDialog} from "native-base";
+import { Button, Box, Center, Text , AlertDialog, alertBu} from "native-base";
 import {UseBLEHOOK} from './useBLE';
 import {BleManager, Device, NativeDevice} from 'react-native-ble-plx';
 import { SafeAreaView} from 'react-native';
-import {useState, useRef} from 'react';
+import {useState, useRef, useEffect} from 'react';
 import{useNavigation} from "@react-navigation/native"
 import deviceInfoModule from 'react-native-device-info';
 import {d} from './useBLE';
@@ -36,7 +36,7 @@ const Scanning = () => {
 
     const [connect, setConnect] = useState("Not Connected\n")
     const [calibrate, setCalibrate] = useState("Not Calibrated")
-    const {writeData, disconnectFromDevice, allDevices, currentDevice, readData} = UseBLEHOOK();
+    const {writeData, disconnectFromDevice, allDevices, currentDevice, readData, hexString} = UseBLEHOOK();
 
     //typeof allDevices[0] !== 'undefined'
     // const startScan = () => {
@@ -66,6 +66,10 @@ const Scanning = () => {
       
       }
     }
+
+    useEffect(() => {
+      console.log('Count has changed!');
+    }, [hexString]);
 
     
 
@@ -172,6 +176,7 @@ const Scanning = () => {
 
             <Button size="lg" onPress={() => readData()} style = {{marginBottom:10}}>Read value 10 from device </Button>
             
+            <Text>Current Read Value{hexString}</Text>
 
             <Button size="lg" style = {buttondiyaStyle} onPress={() => setIsOpen(!isOpen)}>START EXCERCISE</Button>
             <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
