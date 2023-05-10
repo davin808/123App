@@ -140,7 +140,7 @@ const Scanning = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'flex-end' }}>
-          <Image source={require("./assets/title_card2.png")} style= {{width: 300,height: 200, marginTop: "auto", marginLeft:"auto", marginRight:"auto"} } />
+          <Image source={require("./assets/title_card2.png")} style= {{width: 500,height: 200, marginTop: 20} } />
            
           <Text style = {{marginBottom:"auto", marginTop:"auto", textAlign:"center"}} fontSize="lg">
             {connect}

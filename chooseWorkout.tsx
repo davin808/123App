@@ -64,11 +64,11 @@ export default function ChooseComp({ navigationProp }: Props) {
           <ScrollView>
             <Heading alignSelf= "center" size="2xl" style = {{marginTop:"auto", marginBottom:"auto"}}>Choose a Workout</Heading>
             <TouchableHighlight  onPress={() => {setIsOpen(!isOpen); setEname('Bicep Curl');}}>
-              <Image borderRadius={100} source={require('./assets/bc.jpg')} style={{width: 200, height: 200, marginLeft:"auto", marginRight:"auto", marginTop: 50}} />
+              <Image borderRadius={50} source={require('./assets/curl.png')} style={{width: 200, height: 200, marginLeft:"auto", marginRight:"auto", marginTop: 50}} />
             </TouchableHighlight>
 
             <TouchableHighlight  onPress={() => {setEname('Squat'); setIsOpen(!isOpen);}}>
-              <Image borderRadius={100} source={require('./assets/sq.jpg')} style={{width: 200, height: 200, marginLeft:"auto", marginRight:"auto", marginTop: 100}} />
+              <Image borderRadius={50} source={require('./assets/squat.png')} style={{width: 200, height: 200, marginLeft:"auto", marginRight:"auto", marginTop: 100}} />
             </TouchableHighlight>
 
 
