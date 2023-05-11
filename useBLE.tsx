@@ -17,9 +17,18 @@ const pi_UUID = '0000';
 // const pi_SERVICE = '0000180a-0000-1000-8000-00805f9b34fb';
 
 const pi_SERVICE = '0c35e466-ad83-4651-88fa-0ff9d70fbf8c';
-const pi_CHARACTERISTIC = 'a59d3afb-5010-43f0-a241-1ad27e92d7b9';
 
-const EXERCISE_INFO_CHARACTERISTIC_UUID = "f75061a7-e391-4b61-ae4b-95812a2086e3";
+
+
+
+
+export const KEY_FRAME_DATA_UUID = "b26dd24c-6bff-417c-aa16-c857b25b9c28";
+export const KEY_FRAME_HIT_UUID =  "0180ef1a-ef68-11ed-a05b-0242ac120003";
+export const CONTROL_BITS_UUID = "a10fb559-3be8-40e2-aaca-27721b853a71";
+
+
+
+
 const datatoWrite = btoa("01");
 let deviceID = '';
 
@@ -54,10 +63,6 @@ export function UseBLEHOOK() {
         }else{
             console.log("Use effect called");
         }
-
-        
-        
-        
     }, [currentDevice])
     
 
@@ -122,7 +127,7 @@ export function UseBLEHOOK() {
                 return; 
             }
             
-            if (device && (device.localName?.includes("MoCopy (central)"))) {
+            if (device && (device.localName?.includes("MoCopy (test)"))) {
                 // const allDevicenew = [];
                 // allDevicenew[0] = device;
                 // setAllDevices(allDevicenew);  //update allDevice state
@@ -186,26 +191,27 @@ export function UseBLEHOOK() {
 
 
     
-    const writeData =  async(value: string) => {
+    const writeData =  async(value: string, characteristic: string) => {
         try {
             //console.log(connectedDevice!.id);
             //console.log(device!.id);
 
             //count 2 because for somereason only after connecting twice it connects after pressing send 1
-            for (i ; i < 2; i++){
-                console.log('second connect', i);
-                
+            
+                // console.log('write connect', i);
+            for (i; i < 3 ; i++){
                 const dev = await d!.connect();
                 await dev.discoverAllServicesAndCharacteristics();
-               
+                console.log("write", i);
                 setIsConnected(true);
-                
-            }
+
+            } 
+            
 
             await bleManager.writeCharacteristicWithResponseForDevice(
                 d!.id,
-                '0000180a-0000-1000-8000-00805f9b34fb',  // service uuid
-                '00002a57-0000-1000-8000-00805f9b34fb',  //characteristic
+                pi_SERVICE,  // service uuid
+                characteristic,  //characteristic
                 value     //string to base64 data to write
                 
             );
@@ -228,8 +234,8 @@ export function UseBLEHOOK() {
             //console.log(device!.id);
 
             //count 2 because for somereason only after connecting twice it connects after pressing send 1
-            for (i; i < 3 ; i++){
-                console.log('second connect', i);
+            // for (i; i < 3 ; i++){
+            //     console.log('read connect', i);
                 
                 const dev = await d!.connect();
                 await dev.discoverAllServicesAndCharacteristics();
@@ -237,12 +243,12 @@ export function UseBLEHOOK() {
                 setIsConnected(true);
                 d.monitorCharacteristicForService(
                     pi_SERVICE,
-                    pi_CHARACTERISTIC,
+                    KEY_FRAME_HIT_UUID,
                     (error, characteristic) => valueUpdate(error, characteristic),
                 );  
                 
                 
-            }
+            // }
             console.log("successfully read");
             
             
