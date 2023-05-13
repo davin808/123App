@@ -1,14 +1,14 @@
 import React from 'react'
 import {View, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import { Button, Box, Center, Text, Heading, Progress, HStack, Spinner, CheckIcon, AlertDialog} from "native-base";
-import useBLE from './useBLE';
+
 import { SafeAreaView, Image} from 'react-native';
 import {useState, useRef, useEffect} from 'react';
 import{useNavigation} from "@react-navigation/native"
 import ChooseComp from "./chooseWorkout"
 import { RouteProp } from '@react-navigation/native';
 import {RootStackParamList}  from './chooseWorkout';
-import {d, KEY_FRAME_DATA_UUID, CONTROL_BITS_UUID} from './useBLE';
+import {d, KEY_FRAME_DATA_UUID, CONTROL_BITS_UUID, KEY_FRAME_HIT_UUID, hexStringGlobal} from './useBLE';
 import {UseBLEHOOK} from './useBLE';
 import { atob, btoa } from 'react-native-quick-base64';
 import {calcomplete} from './calibration';
@@ -97,8 +97,12 @@ const WorkoutComp = ({ route }: Props) => {
   const exerciseData = {
     bad: 0,
     good: 0,
-    score: 0,
+    score:  0
   };
+
+  function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
   //iphone commands
   //0x01 = start   0x00 = stop      0x02 = start rep     
@@ -110,50 +114,163 @@ const WorkoutComp = ({ route }: Props) => {
   //arduino commands
   //0x03 == rep finished   //0x10 keyframe 1 hit     //0x20 keyframe 2 hit      //0x30 keyframe 3 hit       //0x40 keyframe 4 hit
   // Wrote pseudocode to do beginexercise kinda incorrect
-  const beginExercise = () => {
+  let badFlag = false;
+  const beginExercise = async() => {
     // send start flag to pi send 0x01
     
     setexStart(true);
   
     let r = data.reps;
-  
-    // for (let i = 0; i < r; i++) {
+    
+    for (let i = 0; i < r; i++) {
       // send to pi look for kf 1 & update image to kf 1
       let kfstring = kfdata[0].toString();
-      writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
+      
+      await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
+      
       setimgSrc(require('./assets/step1.png'));
-  
+      
       // wait for kf 1 result
       //while 1 break after timout or hit timout or hit timeout or hit
-      //while(1){
-        // readData();
+      while(1){
+        await readData(KEY_FRAME_HIT_UUID);
         // console.log("read value:", hexString);
-        // if(hexString != hit || hexString != timeout){
+        // console.log(hexString);
+        if(hexStringGlobal == "01" || hexStringGlobal == "00"){
+          break;
+        } 
+        await delay(1000);
+        
+      }
 
-        // }else{
-        //   //break;
-        // }
-      //}
-      // if (hexString == timeout) {
-      //   // if read kf missed start from top of for loop (reset rep).
-      //   // have 3 sec timer to let patient ready to get ready & show incorrect image
-      //   setimgSrc(require('./assets/incorrect.png'));
-      //   //wait for 3 seconds and prompt that rep is restarting in x time
-      //   // to reset rep
-      //   data.reps+=1;
-      //   i-=1;
-      //   continue;
-      // }else{
-      //   setimgSrc(require('./assets/step2.png'));
-      //   let kfstring = kfdata[1].toString();
-      //   writeData(kfstring, KEY_FRAME_DATA_UUID);  //8 bytes
+      await delay(1000);
+      //if timeout
+      if (hexStringGlobal == '00') {  
+        console.log("TIMOUT: missed keyframe 1");
+        // if read kf missed start from top of for loop (reset rep).
+        // have 3 sec timer to let patient ready to get ready & show incorrect image
+        setimgSrc(require('./assets/incorrect.png'));
+        //wait for 3 seconds and prompt that rep is restarting in x time
+        // to reset rep
+        //data.reps+=1;
+        i-=1;
+        badFlag = true; // raise flag for mistake was made during rep;
+        continue;
+      }
 
-      // }
-  
-      //console.log(`Rep ${i} completed`);
+      console.log("Hit keyframe 1");
+      setimgSrc(require('./assets/step2.png'));
+      kfstring = String(kfdata[1]);
+      await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
+
+      // wait for kf 2 result
+      //while 1 break after timout or hit timout or hit timeout or hit
+      while(1){
+        await readData(KEY_FRAME_HIT_UUID);
+        // console.log("read value:", hexString);
+        // console.log(hexString);
+        if(hexStringGlobal == "01" || hexStringGlobal == "00"){
+          break;
+        }
+        
+      }
+
+      await delay(1000);
+      //if timeout
+      if (hexStringGlobal == '00') {  
+        console.log("TIMOUT: missed keyframe 2");
+        // if read kf missed start from top of for loop (reset rep).
+        // have 3 sec timer to let patient ready to get ready & show incorrect image
+        setimgSrc(require('./assets/incorrect.png'));
+        //wait for 3 seconds and prompt that rep is restarting in x time
+        // to reset rep
+        //data.reps+=1;
+        i-=1;
+        badFlag = true; // raise flag for mistake was made during rep;
+        continue;
+      }
+
+      console.log("Hit keyframe 2");
+      setimgSrc(require('./assets/step3.png'));
+      kfstring = String(kfdata[1]);
+      await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
+
+      
+      // wait for kf 3 result
+      //while 1 break after timout or hit timout or hit timeout or hit
+      while(1){
+        await readData(KEY_FRAME_HIT_UUID);
+        // console.log("read value:", hexString);
+        // console.log(hexString);
+        if(hexStringGlobal == "01" || hexStringGlobal == "00"){
+          break;
+        }
+        
+      }
+
+      await delay(1000);
+      //if timeout
+      if (hexStringGlobal == '00') {  
+        console.log("TIMOUT: missed keyframe 3");
+        // if read kf missed start from top of for loop (reset rep).
+        // have 3 sec timer to let patient ready to get ready & show incorrect image
+        setimgSrc(require('./assets/incorrect.png'));
+        //wait for 3 seconds and prompt that rep is restarting in x time
+        // to reset rep
+        //data.reps+=1;
+        i-=1;
+        badFlag = true; // raise flag for mistake was made during rep;
+        continue;
+      }
+
+      console.log("Hit keyframe 3");
+      setimgSrc(require('./assets/step4.png'));
+      kfstring = String(kfdata[1]);
+      await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
+
+
+      // wait for kf 4 result
+      //while 1 break after timout or hit timout or hit timeout or hit
+      while(1){
+        await readData(KEY_FRAME_HIT_UUID);
+        // console.log("read value:", hexString);
+        // console.log(hexString);
+        if(hexStringGlobal == "01" || hexStringGlobal == "00"){
+          break;
+        }
+        
+      }
+      await delay(1000);
+      //if timeout
+      if (hexStringGlobal == '00') {  
+        console.log("TIMOUT: missed keyframe 4");
+        // if read kf missed start from top of for loop (reset rep).
+        // have 3 sec timer to let patient ready to get ready & show incorrect image
+        setimgSrc(require('./assets/incorrect.png'));
+        //wait for 3 seconds and prompt that rep is restarting in x time
+        // to reset rep
+        data.reps+=1;
+        i-=1;
+        badFlag = true; // raise flag for mistake was made during rep;
+        continue;
+      }
+
+      console.log("Hit keyframe 4");
+
+      console.log(`Rep ${i} completed`);
       data.reps -= 1;
-    //}
-  
+
+      if(badFlag == true){
+        exerciseData.bad +=1;
+        badFlag =true;
+      }else{
+        exerciseData.good +=1;
+      }
+      
+    }
+    
+    exerciseData.score = exerciseData.bad / exerciseData.good;
+    console.log("workout score:", exerciseData.score);
   };
    
   //setting the states 

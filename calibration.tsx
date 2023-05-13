@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, SafeAreaView } from 'react-native';
 import { Button, Center, CheckIcon, Heading, Spinner, Text } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
-import useBLE from './useBLE';
+import {UseBLEHOOK} from './useBLE';
+import {d, KEY_FRAME_DATA_UUID, CONTROL_BITS_UUID, i} from './useBLE';
+import { atob, btoa } from 'react-native-quick-base64';
 
 export let calcomplete = false;
 
 const Calibrationcomp = () => {
   const navigation = useNavigation();
-
+  const {writeData, disconnectFromDevice, allDevices, currentDevice, readData, hexString, connectToDevice} = UseBLEHOOK();
   const [countdown, setCountdown] = useState(1);
   const [complete, setComplete] = useState(false);
   const [start, setStart] = useState(false);
@@ -30,6 +32,8 @@ const Calibrationcomp = () => {
         calcomplete = true;
         clearTimeout(timer);
         setComplete(true);
+        writeData(btoa("49") , CONTROL_BITS_UUID);
+        console.log("sent calibrate control SENT MDE= decode to ascii from base64 ==01 ");
       }
       return () => clearTimeout(timer);
     } else {

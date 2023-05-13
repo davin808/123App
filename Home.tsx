@@ -7,8 +7,9 @@ import { SafeAreaView} from 'react-native';
 import {useState, useRef, useEffect} from 'react';
 import{useNavigation} from "@react-navigation/native"
 import deviceInfoModule from 'react-native-device-info';
-import {d} from './useBLE';
+import {d,KEY_FRAME_DATA_UUID, KEY_FRAME_HIT_UUID, CONTROL_BITS_UUID} from './useBLE';
 import { atob, btoa } from 'react-native-quick-base64';
+
 
 // const styles = StyleSheet.create({
 //     one: {
@@ -174,9 +175,9 @@ const Scanning = () => {
 
             {/* <Text fontSize="md" color={'blue.900'}>Connected Device: {allDevices[0].name}</Text> */}
 
-            <Button size="lg" onPress={() => writeData(btoa("01"))} style = {{marginBottom:10}}>Send 1 to </Button>
+            <Button size="lg" onPress={() => writeData(btoa("01"), CONTROL_BITS_UUID)} style = {{marginBottom:10}}>Send 1 to </Button>
 
-            <Button size="lg" onPress={() => readData()} style = {{marginBottom:10}}>Read value 10 from device </Button>
+            <Button size="lg" onPress={() => readData(KEY_FRAME_HIT_UUID)} style = {{marginBottom:10}}>Read value 10 from device </Button>
             
             <Text>Current Read Value{hexString}</Text>
 

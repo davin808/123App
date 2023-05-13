@@ -1,5 +1,5 @@
 import {PermissionsAndroid, Platform} from 'react-native';
-import {BleManager, Device,BleError, Characteristic, NativeDevice} from 'react-native-ble-plx';
+import {BleManager, Device,BleError, Characteristic, NativeDevice, Base64} from 'react-native-ble-plx';
 import { useState, useEffect} from 'react';
 import { getDeviceSync } from 'react-native-device-info';
 import DeviceInfo from 'react-native-device-info';
@@ -34,6 +34,7 @@ let deviceID = '';
 
 export let d: Device;
 export let v: string;
+export let hexStringGlobal: string;
 
 
 let i = 0;   //counter for write and read
@@ -49,19 +50,18 @@ export function UseBLEHOOK() {
     const [isConnected, setIsConnected] = useState(false);
     const [hexString, sethexString] = useState('');
 
-    useEffect(() => {
-        const connect = async() => {
-            await connectToDevice();
-            // await d.discoverAllServicesAndCharacteristics();
-        }
+    const connect = async() => {
+        await connectToDevice();
+        // await d.discoverAllServicesAndCharacteristics();
+    }
 
+    useEffect(() => {
+        
         if(currentDevice != null){
             console.log("running the connect funciton");
             connect();
         }else if(currentDevice == null){
             console.log("current device went null");
-        }else{
-            console.log("Use effect called");
         }
     }, [currentDevice])
     
@@ -135,7 +135,7 @@ export function UseBLEHOOK() {
                 //console.log("Found in scan",allDevices[0].name, device.localName);
                 bleManager.stopDeviceScan();
                 deviceID = device.id;
-                
+                connectToDevice();
 
                 console.log('after connect call')
                 return(null);
@@ -191,7 +191,7 @@ export function UseBLEHOOK() {
 
 
     
-    const writeData =  async(value: string, characteristic: string) => {
+    const writeData =  async(value: Base64, characteristic: string) => {
         try {
             //console.log(connectedDevice!.id);
             //console.log(device!.id);
@@ -199,17 +199,17 @@ export function UseBLEHOOK() {
             //count 2 because for somereason only after connecting twice it connects after pressing send 1
             
                 // console.log('write connect', i);
-            for (i; i < 3 ; i++){
-                const dev = await d!.connect();
-                await dev.discoverAllServicesAndCharacteristics();
-                console.log("write", i);
-                setIsConnected(true);
+            // for (i; i < 3 ; i++){
+            //     const dev = await d!.connect();
+            //     await dev.discoverAllServicesAndCharacteristics();
+            //     console.log("write", i);
+            //     setIsConnected(true);
 
-            } 
+            // } 
             
 
             await bleManager.writeCharacteristicWithResponseForDevice(
-                d!.id,
+                deviceID,
                 pi_SERVICE,  // service uuid
                 characteristic,  //characteristic
                 value     //string to base64 data to write
@@ -218,7 +218,26 @@ export function UseBLEHOOK() {
             console.log("successfully wrote:", value);
             
           } catch (e) {
-            console.log('Error when Writing',e);
+            
+
+            if(e == "BleError: Device ? is already connected"){
+                console.log("already connected exception")
+                await bleManager.writeCharacteristicWithoutResponseForDevice(
+                    deviceID,
+                    pi_SERVICE,  // service uuid
+                    characteristic,  //characteristic
+                    value     //string to base64 data to write
+                    
+                );
+            }else if (e == "BleError: Device 06:E1:44:FC:4B:4B is not connected"){
+                console.log("not connected exception");
+                const dev = await d!.connect();
+                await dev.discoverAllServicesAndCharacteristics();
+                writeData(value, characteristic);
+            }else{
+                console.log('Error in Writing funciton',e);
+            }
+            
           }
           
 
@@ -228,7 +247,7 @@ export function UseBLEHOOK() {
     };
     
     
-    const readData =  async() => {
+    const readData =  async(characteristic: string) => {
         try {
             //console.log(connectedDevice!.id);
             //console.log(device!.id);
@@ -236,25 +255,40 @@ export function UseBLEHOOK() {
             //count 2 because for somereason only after connecting twice it connects after pressing send 1
             // for (i; i < 3 ; i++){
             //     console.log('read connect', i);
-                
-                const dev = await d!.connect();
-                await dev.discoverAllServicesAndCharacteristics();
-               
-                setIsConnected(true);
-                d.monitorCharacteristicForService(
+
+                const c = await bleManager.readCharacteristicForDevice(
+                    deviceID,
                     pi_SERVICE,
-                    KEY_FRAME_HIT_UUID,
-                    (error, characteristic) => valueUpdate(error, characteristic),
+                    characteristic,
                 );  
                 
+                if (c != null){
+                    const byteCharacters = atob(c?.value);
+                    const byteNumbers = new Array(byteCharacters.length);
+
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+
+                    // Convert byte array to hex string
+                    const hexString1 = Array.from(byteArray)
+                    .map((byte) => {
+                        return ('0' + byte.toString(16)).slice(-2);
+                    })
+                    .join('');
+
+                    sethexString(hexString1);
+                    hexStringGlobal = hexString1;
+                    
+                    console.log("value: ", hexString1);
+                }else{
+                    console.log("read characteristic is null");
+                }
                 
             // }
-            console.log("successfully read");
+            console.log("successfully read value", hexStringGlobal);
             
-            
-            
-            
-
             
         //     await bleManager.readCharacteristicForDevice(
         //         d!.id,
@@ -262,7 +296,30 @@ export function UseBLEHOOK() {
         //         '00002a57-0000-1000-8000-00805f9b34fb'  //characteristic         
         //     );
           } catch (e) {
-            console.log('Error when Writing',e);
+            
+
+            if(e == "BleError: Device ? is already connected"){
+                let c = await bleManager.readCharacteristicForDevice(
+                    deviceID,
+                    pi_SERVICE,  // service uuid
+                    characteristic,  //characteristic
+                    
+                );
+
+            }else if (e == "BleError: Device 06:E1:44:FC:4B:4B is not connected"){
+                console.log("Read not connected exception")
+                const dev = await d!.connect();
+                await dev.discoverAllServicesAndCharacteristics();
+                readData(characteristic);
+            }else if(e == "BleError: Device 06:E1:44:FC:4B:4B was disconnected"){
+                console.log("Read not connected exception")
+                const dev = await d!.connect();
+                await dev.discoverAllServicesAndCharacteristics();
+                readData(characteristic);
+            }else{
+                console.log('Error in Reading funciton',e);
+            }
+            
           }
           
 
