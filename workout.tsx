@@ -90,7 +90,9 @@ const WorkoutComp = ({ route }: Props) => {
   const {writeData, disconnectFromDevice, allDevices, currentDevice, readData, hexString} = UseBLEHOOK();
   const navigation = useNavigation();
   const [exStart, setexStart] = useState(false);
+  const [exEnd, setexEnd] = useState(false);
   const [imageNum, setimageNum] = useState(1);
+  const [score, setScore] = useState(9);
   const [imgSrc, setimgSrc] = useState(
     require('./assets/step1.png'),
   );
@@ -124,7 +126,7 @@ const WorkoutComp = ({ route }: Props) => {
     
     for (let i = 0; i < r; i++) {
       // send to pi look for kf 1 & update image to kf 1
-      let kfstring = kfdata[0].toString();
+      let kfstring = String(kfdata[0]);
       
       await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
       
@@ -139,11 +141,11 @@ const WorkoutComp = ({ route }: Props) => {
         if(hexStringGlobal == "01" || hexStringGlobal == "00"){
           break;
         } 
-        await delay(1000);
+        //await delay(1000);
         
       }
 
-      await delay(1000);
+      //await delay(1000);
       //if timeout
       if (hexStringGlobal == '00') {  
         console.log("TIMOUT: missed keyframe 1");
@@ -175,7 +177,7 @@ const WorkoutComp = ({ route }: Props) => {
         
       }
 
-      await delay(1000);
+      //await delay(1000);
       //if timeout
       if (hexStringGlobal == '00') {  
         console.log("TIMOUT: missed keyframe 2");
@@ -192,7 +194,7 @@ const WorkoutComp = ({ route }: Props) => {
 
       console.log("Hit keyframe 2");
       setimgSrc(require('./assets/step3.png'));
-      kfstring = String(kfdata[1]);
+      kfstring = String(kfdata[2]);
       await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
 
       
@@ -208,7 +210,7 @@ const WorkoutComp = ({ route }: Props) => {
         
       }
 
-      await delay(1000);
+      //await delay(1000);
       //if timeout
       if (hexStringGlobal == '00') {  
         console.log("TIMOUT: missed keyframe 3");
@@ -225,7 +227,7 @@ const WorkoutComp = ({ route }: Props) => {
 
       console.log("Hit keyframe 3");
       setimgSrc(require('./assets/step4.png'));
-      kfstring = String(kfdata[1]);
+      kfstring = String(kfdata[3]);
       await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
 
 
@@ -240,7 +242,7 @@ const WorkoutComp = ({ route }: Props) => {
         }
         
       }
-      await delay(1000);
+      //await delay(1000);
       //if timeout
       if (hexStringGlobal == '00') {  
         console.log("TIMOUT: missed keyframe 4");
@@ -249,7 +251,7 @@ const WorkoutComp = ({ route }: Props) => {
         setimgSrc(require('./assets/incorrect.png'));
         //wait for 3 seconds and prompt that rep is restarting in x time
         // to reset rep
-        data.reps+=1;
+    
         i-=1;
         badFlag = true; // raise flag for mistake was made during rep;
         continue;
@@ -269,8 +271,14 @@ const WorkoutComp = ({ route }: Props) => {
       
     }
     
-    exerciseData.score = exerciseData.bad / exerciseData.good;
-    console.log("workout score:", exerciseData.score);
+    data.reps =0;
+    exerciseData.score = exerciseData.good / r;
+    exerciseData.score *=100;
+    setScore(exerciseData.score);
+    
+    console.log("workout score:", exerciseData.score, exerciseData.bad, exerciseData.good);
+    
+    setexEnd(true);
   };
    
   //setting the states 
@@ -371,11 +379,18 @@ const WorkoutComp = ({ route }: Props) => {
             
         }
 
+        {exEnd
+            ? <Text>Exercise Completed! Score = {score}%</Text>
+            : <Text></Text>
+        }
+
         
         {exStart
             ? <Image source={imgSrc} style={{width: 250, height: 500, marginTop: 20, marginLeft: "auto", marginRight: "auto"}} />
             : <Text></Text>
         }
+
+        
 
         
         

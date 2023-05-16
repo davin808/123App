@@ -55,15 +55,15 @@ export function UseBLEHOOK() {
         // await d.discoverAllServicesAndCharacteristics();
     }
 
-    useEffect(() => {
+    // useEffect(() => {
         
-        if(currentDevice != null){
-            console.log("running the connect funciton");
-            connect();
-        }else if(currentDevice == null){
-            console.log("current device went null");
-        }
-    }, [currentDevice])
+    //     if(currentDevice != null){
+    //         console.log("running the connect funciton");
+    //         connect();
+    //     }else if(currentDevice == null){
+    //         console.log("current device went null");
+    //     }
+    // }, [currentDevice])
     
 
     
@@ -127,7 +127,7 @@ export function UseBLEHOOK() {
                 return; 
             }
             
-            if (device && (device.localName?.includes("MoCopy (test)"))) {
+            if (device && (device.localName?.includes("MoCopy (central)"))) {
                 // const allDevicenew = [];
                 // allDevicenew[0] = device;
                 // setAllDevices(allDevicenew);  //update allDevice state
@@ -135,6 +135,9 @@ export function UseBLEHOOK() {
                 //console.log("Found in scan",allDevices[0].name, device.localName);
                 bleManager.stopDeviceScan();
                 deviceID = device.id;
+                
+                //connect();
+                
                 connectToDevice();
 
                 console.log('after connect call')
@@ -168,6 +171,10 @@ export function UseBLEHOOK() {
 
         } catch (error) {
             console.log('Error connecting to device:', error);
+            
+            // if (error == "TypeError: Cannot read property 'id' of null"){
+            //     connectToDevice();
+            // }
         }
     };
 
@@ -229,11 +236,22 @@ export function UseBLEHOOK() {
                     value     //string to base64 data to write
                     
                 );
-            }else if (e == "BleError: Device 06:E1:44:FC:4B:4B is not connected"){
+            }else if (e == "BleError: Device 05:12:34:4C:38:4E is not connected"){
                 console.log("not connected exception");
-                const dev = await d!.connect();
-                await dev.discoverAllServicesAndCharacteristics();
-                writeData(value, characteristic);
+                try{
+                    const dev = await d!.connect();
+                    await dev.discoverAllServicesAndCharacteristics();
+                    await writeData(value, characteristic);
+                }catch(err){
+                    if(e == "BleError: Device 05:12:34:4C:38:4E was disconnected"){
+                        console.log("catch connect ex");
+                        const dev = await d!.connect();
+                        await dev.discoverAllServicesAndCharacteristics();
+                        await writeData(value, characteristic);
+                    }
+                }
+                
+
             }else{
                 console.log('Error in Writing funciton',e);
             }
@@ -306,16 +324,39 @@ export function UseBLEHOOK() {
                     
                 );
 
-            }else if (e == "BleError: Device 06:E1:44:FC:4B:4B is not connected"){
+            }else if (e == "BleError: Device 05:12:34:4C:38:4E is not connected"){
                 console.log("Read not connected exception")
-                const dev = await d!.connect();
-                await dev.discoverAllServicesAndCharacteristics();
-                readData(characteristic);
-            }else if(e == "BleError: Device 06:E1:44:FC:4B:4B was disconnected"){
-                console.log("Read not connected exception")
-                const dev = await d!.connect();
-                await dev.discoverAllServicesAndCharacteristics();
-                readData(characteristic);
+                try{
+                    const dev = await d!.connect();
+                    await dev.discoverAllServicesAndCharacteristics();
+                    await readData(characteristic);
+                }catch(err){
+                    if(e == "BleError: Device 05:12:34:4C:38:4E was disconnected"){
+                        console.log("catch connect ex");
+                        const dev = await d!.connect();
+                        await dev.discoverAllServicesAndCharacteristics();
+                        await readData(characteristic);
+                    }
+                }
+                
+                console.log("Read");
+            }else if(e == "BleError: Device 05:12:34:4C:38:4E was disconnected"){
+                console.log("Read disconnected xception");
+                try{
+                    const dev = await d!.connect();
+                    await dev.discoverAllServicesAndCharacteristics();
+                    await readData(characteristic);
+                }catch(err){
+                    if(e == "BleError: Device 05:12:34:4C:38:4E was disconnected"){
+                        console.log("catch connect ex");
+                        const dev = await d!.connect();
+                        await dev.discoverAllServicesAndCharacteristics();
+                        await readData(characteristic);
+                    }
+                }
+                
+                console.log("Read");
+
             }else{
                 console.log('Error in Reading funciton',e);
             }

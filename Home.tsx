@@ -175,7 +175,7 @@ const Scanning = () => {
 
             {/* <Text fontSize="md" color={'blue.900'}>Connected Device: {allDevices[0].name}</Text> */}
 
-            <Button size="lg" onPress={() => writeData(btoa("01"), CONTROL_BITS_UUID)} style = {{marginBottom:10}}>Send 1 to </Button>
+            <Button size="lg" onPress={() => writeData(btoa("10"), CONTROL_BITS_UUID)} style = {{marginBottom:10}}>Send 1 to </Button>
 
             <Button size="lg" onPress={() => readData(KEY_FRAME_HIT_UUID)} style = {{marginBottom:10}}>Read value 10 from device </Button>
             
