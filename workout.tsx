@@ -85,6 +85,12 @@ const styles = StyleSheet.create({
 let currentState = 1; 
 //let imageSource = require('./assets/step1.png'); 
 
+export let exerciseData = {
+  bad: 0,
+  good: 0,
+  score:  0
+};
+
 const WorkoutComp = ({ route }: Props) => {
   const { data } = route.params;
   const {writeData, disconnectFromDevice, allDevices, currentDevice, readData, hexString} = UseBLEHOOK();
@@ -96,11 +102,7 @@ const WorkoutComp = ({ route }: Props) => {
   const [imgSrc, setimgSrc] = useState(
     require('./assets/step1.png'),
   );
-  const exerciseData = {
-    bad: 0,
-    good: 0,
-    score:  0
-  };
+  
 
   function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -279,6 +281,8 @@ const WorkoutComp = ({ route }: Props) => {
     console.log("workout score:", exerciseData.score, exerciseData.bad, exerciseData.good);
     
     setexEnd(true);
+    await writeData(btoa("04"), KEY_FRAME_DATA_UUID);  //send 51 (exercisedone)
+
   };
    
   //setting the states 

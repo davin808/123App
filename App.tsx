@@ -28,7 +28,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Calibrationcomp from './calibration';
 import Scancomp from './scan';
 import ChooseComp from './chooseWorkout';
-import WorkoutComp from './workout'
+import WorkoutComp from './workout';
+import ResultsScreen from './results';
 
 
 const Stack = createNativeStackNavigator();
@@ -55,6 +56,7 @@ function App(): JSX.Element {
             <Stack.Screen name = "Begin Scan" component = {Scancomp} ></Stack.Screen>
             <Stack.Screen name = "Choose Workout" component = {ChooseComp}></Stack.Screen>
             <Stack.Screen name = "Begin Workout!" component = {WorkoutComp}></Stack.Screen>
+            <Stack.Screen name = "Workout Completed!" component = {ResultsScreen}></Stack.Screen>
           </Stack.Navigator>
         
 

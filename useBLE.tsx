@@ -17,8 +17,8 @@ const pi_UUID = '0000';
 // const pi_SERVICE = '0000180a-0000-1000-8000-00805f9b34fb';
 
 const pi_SERVICE = '0c35e466-ad83-4651-88fa-0ff9d70fbf8c';
-
-
+//06:E1:44:FC:4B:4B
+//central id^
 
 
 
@@ -236,14 +236,14 @@ export function UseBLEHOOK() {
                     value     //string to base64 data to write
                     
                 );
-            }else if (e == "BleError: Device 05:12:34:4C:38:4E is not connected"){
+            }else if (e == "BleError: Device 06:E1:44:FC:4B:4B is not connected"){
                 console.log("not connected exception");
                 try{
                     const dev = await d!.connect();
                     await dev.discoverAllServicesAndCharacteristics();
                     await writeData(value, characteristic);
                 }catch(err){
-                    if(e == "BleError: Device 05:12:34:4C:38:4E was disconnected"){
+                    if(e == "BleError: Device 06:E1:44:FC:4B:4B was disconnected"){
                         console.log("catch connect ex");
                         const dev = await d!.connect();
                         await dev.discoverAllServicesAndCharacteristics();
@@ -324,14 +324,14 @@ export function UseBLEHOOK() {
                     
                 );
 
-            }else if (e == "BleError: Device 05:12:34:4C:38:4E is not connected"){
+            }else if (e == "BleError: Device 06:E1:44:FC:4B:4B is not connected"){
                 console.log("Read not connected exception")
                 try{
                     const dev = await d!.connect();
                     await dev.discoverAllServicesAndCharacteristics();
                     await readData(characteristic);
                 }catch(err){
-                    if(e == "BleError: Device 05:12:34:4C:38:4E was disconnected"){
+                    if(e == "BleError: Device 06:E1:44:FC:4B:4B was disconnected"){
                         console.log("catch connect ex");
                         const dev = await d!.connect();
                         await dev.discoverAllServicesAndCharacteristics();
@@ -340,14 +340,14 @@ export function UseBLEHOOK() {
                 }
                 
                 console.log("Read");
-            }else if(e == "BleError: Device 05:12:34:4C:38:4E was disconnected"){
+            }else if(e == "BleError: Device 06:E1:44:FC:4B:4B was disconnected"){
                 console.log("Read disconnected xception");
                 try{
                     const dev = await d!.connect();
                     await dev.discoverAllServicesAndCharacteristics();
                     await readData(characteristic);
                 }catch(err){
-                    if(e == "BleError: Device 05:12:34:4C:38:4E was disconnected"){
+                    if(e == "BleError: Device 06:E1:44:FC:4B:4B was disconnected"){
                         console.log("catch connect ex");
                         const dev = await d!.connect();
                         await dev.discoverAllServicesAndCharacteristics();
