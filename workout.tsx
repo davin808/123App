@@ -358,9 +358,19 @@ const WorkoutComp = ({ route }: Props) => {
   return (
     <SafeAreaView>
       <ScrollView>
-        <Heading size="2xl" style = {{marginTop:50, marginBottom:50}}>Exercise: {data.name}</Heading>
+        <Heading size="2xl" style = {{marginTop:50, marginBottom:50, textAlign: 'center'}}>Exercise: {data.name}</Heading>
         
-        <Text>Reps to Go!: {data.reps}</Text>
+        <Text style={{
+        fontSize: 20,
+        color: data.reps === 0 ? 'green' : data.reps === data.reps / 2 ? 'yellow' : 'red',
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center'
+        }}>
+          Reps to Go!: {data.reps}
+        </Text>
+
+
 
         <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
               <AlertDialog.Content style={{ backgroundColor: 'gray' }}>
@@ -388,20 +398,14 @@ const WorkoutComp = ({ route }: Props) => {
             : <Text></Text>
         }
 
-        
         {exStart
             ? <Image source={imgSrc} style={{width: 250, height: 500, marginTop: 20, marginLeft: "auto", marginRight: "auto"}} />
             : <Text></Text>
         }
 
-        
-
-        
-        
-
-        <Button size="lg" style = {{marginLeft: "auto", marginRight: "auto"}} onPress={() => setimgSrc(require('./assets/step3.png'))}> Other keyframe </Button>
+        {/* <Button size="lg" style = {{marginLeft: "auto", marginRight: "auto"}} onPress={() => setimgSrc(require('./assets/step3.png'))}> Other keyframe </Button>
         <Text></Text>
-        <Button size="lg" style = {{marginLeft: "auto", marginRight: "auto"}} onPress={handleButton}> Incorrect </Button>
+        <Button size="lg" style = {{marginLeft: "auto", marginRight: "auto"}} onPress={handleButton}> Incorrect </Button> */}
 
 
         

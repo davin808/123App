@@ -35,9 +35,10 @@ const Scanning = () => {
     // const nativedum = new nativeDevice();
     // const dummy = new Device(dummyman);
 
-    const [connect, setConnect] = useState("\n")
-    const [calibrate, setCalibrate] = useState("\n")
-    const {writeData, disconnectFromDevice, allDevices, currentDevice, readData, hexString} = UseBLEHOOK();
+    const [deviceConnected, setConnect] = useState(false);
+    //const [connect, setConnect] = useState("\n")
+    //const [calibrate, setCalibrate] = useState("\n")
+    const {writeData, disconnectFromDevice, allDevices, currentDevice, readData, hexString, isConnected} = UseBLEHOOK();
 
     //typeof allDevices[0] !== 'undefined'
     // const startScan = () => {
@@ -106,9 +107,16 @@ const Scanning = () => {
       setIsOpen(false);
     }
 
-    const onContinue =() => {
-      navigation.navigate("Choose Workout", {name: 'Here from pressing Scan button'});
-    }
+    // const onContinue =() => {
+    //   navigation.navigate("Choose Workout", {name: 'Here from pressing Scan button'});
+    // }
+
+    const onContinue = () => {
+      console.log(isConnected)
+      if (true) {
+        navigation.navigate("Choose Workout", { name: 'Here from pressing Scan button' });
+      }
+    };
     
 
     const cancelRef = useRef(null);
@@ -118,6 +126,28 @@ const Scanning = () => {
       
       console.log("successfuly disconnected");
     }
+
+    const unclickableButtonStyle = {
+      opacity: 1.0,
+      width: 200,
+      height: 50,
+      backgroundColor: '#FF0000',
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 20,
+    };
+  
+    const clickableButtonStyle = {
+      width: 200,
+      height: 50,
+      backgroundColor: '#1a7045',
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 20
+    };
+  
 
     const buttondiyaStyle = {
       width: 200,
@@ -140,67 +170,21 @@ const Scanning = () => {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, justifyContent: 'flex-end' }}>
-          <Image source={require("./assets/title_card2.png")} style= {{width: 250,height: 240, marginTop: "auto", marginLeft: "auto", marginRight: "auto"} } />
-           
-          {/* <Text style = {{marginBottom:"auto", marginTop:"auto", textAlign:"center"}} fontSize="lg">
-            {connect}
-            {calibrate}
-          </Text> */}
-          <Box alignItems="center">
-
-            {/* <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Connect to Scan For BLE Devices!</Text> */}
-            {/* <Button onPress={() => navigation.navigate('BLE', {name: 'Here from pressing Scan button'})}> Scan </Button> */}
-            {/* {allDevices.map((device: Device) => (
-            <Text>{device.name}</Text>
-            ))} */}
-            <Button size="lg" style = {buttondiyaStyle} onPress={openScan}>CONNECT DEVICE</Button>
-            {/* <TouchableOpacity onPress={openModal}> 
-            <Text> {"Scan"} </Text>
-            </TouchableOpacity> */}
-
-            {/* <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Calibrate Your BLE Device</Text> */}
-            <Button size="lg" onPress={openCalibrate} style = {buttondiyaStyle}>CALIBRATE</Button>
-            
-            {/* <Text style = {{marginBottom:20, marginTop: 30}} fontSize="lg">Press to Disconnect Your BLE Device</Text> */}
-            <Button size="lg" onPress={openDC} style = {buttondiyaStyle}>DISCONNECT</Button>
-            
-            {/* {allDevices.map((device: Device) => (
-                <Text fontSize="md" color={'blue.900'}>Connected Device: {device.name}</Text>
-            ))} */}
-
-            {/* <Text>
-              {d?.name}
-            </Text> */}
-
-            {/* <Text fontSize="md" color={'blue.900'}>Connected Device: {allDevices[0].name}</Text> */}
-
-            <Button size="lg" onPress={() => writeData(btoa("10"), CONTROL_BITS_UUID)} style = {{marginBottom:10}}>Send 1 to </Button>
-
-            <Button size="lg" onPress={() => readData(KEY_FRAME_HIT_UUID)} style = {{marginBottom:10}}>Read value 10 from device </Button>
-            
-            <Text>Current Read Value{hexString}</Text>
-
-            <Button size="lg" style = {buttondiyaStyle} onPress={() => setIsOpen(!isOpen)}>START EXCERCISE</Button>
-            <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
-              <AlertDialog.Content style={{ backgroundColor: 'gray' }}>
-                <AlertDialog.CloseButton />
-                <AlertDialog.Header style={{textAlign: "center"}}>Please Check</AlertDialog.Header>
-                <AlertDialog.Body>
-                  Please double check that the device is connected and calibrated.
-                </AlertDialog.Body>
-                <AlertDialog.Footer justifyContent="center">
-                  <Button style={{alertbuttons, backgroundColor: '#1a7045'}} size="lg" onPress={onContinue}>Continue</Button>
-                </AlertDialog.Footer>
-                <Button variant="unstyled" colorScheme="coolGray" onPress={onClose} ref={cancelRef}>
-                  Back
-                </Button>
-              </AlertDialog.Content>
-            </AlertDialog>
+        <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
+          <View style={{ alignItems: 'center' }}>
+            <Image source={require("./assets/title_card2.png")} style= {{width: 250,height: 240, marginTop: -300, marginLeft: "auto", marginRight: "auto"} } />
+            <Box alignItems="center">
 
             
-          </Box>
-          
+              <Button size="lg" style = {buttondiyaStyle} onPress={openScan}>CONNECT DEVICE</Button>
+              <Button size="lg" style={true ? clickableButtonStyle : unclickableButtonStyle} onPress={onContinue}>START EXERCISE</Button>
+
+              {/* <Button size="lg" style = {buttondiyaStyle} onPress={onContinue}>START EXCERCISE</Button> */}
+              
+
+              
+            </Box>
+          </View>
         </SafeAreaView>
     );
 };

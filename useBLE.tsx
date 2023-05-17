@@ -47,7 +47,7 @@ export function UseBLEHOOK() {
     const [currentDevice, setCurrentDevice] = (useState<Device | null>(null));
     const [connectedDevice, setConnectedDevice] = (useState<Device | null>(null));
     const [command, setcommand] = useState<number>(0);
-    const [isConnected, setIsConnected] = useState(false);
+    var [isConnected, setIsConnected] = useState(false);
     const [hexString, sethexString] = useState('');
 
     const connect = async() => {
@@ -160,7 +160,7 @@ export function UseBLEHOOK() {
             setConnectedDevice(d);
             // const services = await device.services();
             
-            
+            setIsConnected(true);
             // const characteristics = await device.characteristicsForService('0000180a-0000-1000-8000-00805f9b34fb');
             // console.log(characteristics);
             
@@ -416,6 +416,7 @@ export function UseBLEHOOK() {
         command,
         readData, 
         valueUpdate,
-        hexString
+        hexString,
+        isConnected
     };
 }

@@ -11,7 +11,7 @@ import {d} from './useBLE';
 
 export default function Scancomp() {
     const {requestPermissions, scanForDevices, allDevices, writeData,currentDevice} = UseBLEHOOK();
-
+    var connected = false
     const openModal = async () => {
         await requestPermissions(isGranted => {
           if (isGranted) {
@@ -32,7 +32,7 @@ export default function Scancomp() {
     return (
     <SafeAreaView>
         <Box alignItems="center">
-            <Heading size="md" style = {{marginTop: 30}}>Devices Found</Heading>
+            <Heading size="lg" style = {{marginTop: 50, fontSize: 32}}>Devices Found</Heading>
             {/* {currentDevice.map((device: Device) => (
                 <Text fontSize="md" color={'blue.900'}>{currentDevice.name}</Text>
             ))} */}
@@ -42,11 +42,14 @@ export default function Scancomp() {
           {(() => {
             if (d != null) {
               return (
-                <Text>{d.name}</Text>
+                <>
+                  <Text style={{ fontSize: 20, marginBottom: 20, marginTop: 10 }}>{d.name}</Text>
+                  <Text style={{ color: 'green', fontSize: 20 }}>Connected</Text>
+                </>
               )
             } else if (d == null) {
               return (
-                <Text>Nothing Connected</Text>
+                <Text style={{ color: 'red', fontSize: 20 }}>Nothing Connected</Text>
               )
             } else {
               return (
@@ -55,12 +58,9 @@ export default function Scancomp() {
             }
           })()}
 
-          
             
-            
-            <Button size="lg" onPress={openModal} style = {{marginTop: 30}}>Scan</Button>
-                
-        
+            <Button size="lg" onPress={openModal} style={{ marginTop: 40, width: 200 }}>Scan</Button>
+                      
         </Box>
         
     </SafeAreaView>
