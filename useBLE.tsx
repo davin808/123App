@@ -237,7 +237,6 @@ export function UseBLEHOOK() {
                     
                 );
             }else if (e == "BleError: Device 06:E1:44:FC:4B:4B is not connected"){
-                console.log("not connected exception");
                 try{
                     const dev = await d!.connect();
                     await dev.discoverAllServicesAndCharacteristics();
@@ -250,6 +249,8 @@ export function UseBLEHOOK() {
                         await writeData(value, characteristic);
                     }
                 }
+
+                console.log("not connected exception");
                 
 
             }else{

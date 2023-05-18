@@ -32,7 +32,8 @@ import {calcomplete} from './calibration';
 //     reps: number;
 // };
 
-let kfdata: number[] = [0.0, 20.0, 45.0, 90.0 ];
+
+
 let kfdata1: number[] = [-5.0, 0.0, -3.0, 5.0, 0.0, 3.0];
 let kfdata2: number[] = [9.0, 0.0, 5.0, -10.0, 0.0, -6.0];
 let kfdata3: number[] = [18.0, 0.0, 11.0, -18.0, 0.0, -11.0];
@@ -125,7 +126,7 @@ const WorkoutComp = ({ route }: Props) => {
     require('./assets/step1.png'),
   );
   
-
+  
   function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -147,15 +148,17 @@ const WorkoutComp = ({ route }: Props) => {
     setexStart(true);
   
     let r = data.reps;
-    
+    let kfstring: string;
     for (let i = 0; i < r; i++) {
       // send to pi look for kf 1 & update image to kf 1
-      let kfstring = String(kfdata[0]);
-      
-      // await writeData(btoa("-5 0 -3 5 0 3"), KEY_FRAME_DATA_UUID);  //8 bytes
-      await writeData(btoa(), KEY_FRAME_DATA_UUID);
-      await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
       setimgSrc(require('./assets/step1.png'));
+      console.log(floatsToBase64(kfdata1));
+      kfstring = floatsToBase64(kfdata1);
+      await writeData(kfstring, KEY_FRAME_DATA_UUID);
+      console.log("writtten");
+      
+      await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
+      
       
       // wait for kf 1 result
       //while 1 break after timout or hit timout or hit timeout or hit
@@ -167,7 +170,6 @@ const WorkoutComp = ({ route }: Props) => {
           break;
         } 
         //await delay(1000);
-        
       }
 
       //await delay(1000);
@@ -177,20 +179,21 @@ const WorkoutComp = ({ route }: Props) => {
         // if read kf missed start from top of for loop (reset rep).
         // have 3 sec timer to let patient ready to get ready & show incorrect image
         setimgSrc(require('./assets/incorrect.png'));
+        
         //wait for 3 seconds and prompt that rep is restarting in x time
         // to reset rep
         //data.reps+=1;
+        
         i-=1;
         badFlag = true; // raise flag for mistake was made during rep;
         continue;
       }
-
+      setimgSrc(require('./assets/step2.png'));
       await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
 
       console.log("Hit keyframe 1");
-      setimgSrc(require('./assets/step2.png'));
-      kfstring = String(kfdata[1]);
-      await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
+      
+      await writeData(floatsToBase64(kfdata2), KEY_FRAME_DATA_UUID);
 
       // wait for kf 2 result
       //while 1 break after timout or hit timout or hit timeout or hit
@@ -218,11 +221,12 @@ const WorkoutComp = ({ route }: Props) => {
         badFlag = true; // raise flag for mistake was made during rep;
         continue;
       }
+      setimgSrc(require('./assets/step3.png'));
       await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
       console.log("Hit keyframe 2");
-      setimgSrc(require('./assets/step3.png'));
-      kfstring = String(kfdata[2]);
-      await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
+      
+      
+      await writeData(floatsToBase64(kfdata3), KEY_FRAME_DATA_UUID);
 
       
       // wait for kf 3 result
@@ -251,11 +255,14 @@ const WorkoutComp = ({ route }: Props) => {
         badFlag = true; // raise flag for mistake was made during rep;
         continue;
       }
+      setimgSrc(require('./assets/step4.png'));
+
+
       await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
       console.log("Hit keyframe 3");
-      setimgSrc(require('./assets/step4.png'));
-      kfstring = String(kfdata[3]);
-      await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
+      
+      
+      await writeData(floatsToBase64(kfdata4), KEY_FRAME_DATA_UUID);
 
 
       // wait for kf 4 result
