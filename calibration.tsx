@@ -36,7 +36,7 @@ const Calibrationcomp = () => {
         calcomplete = true;
         clearTimeout(timer);
         setComplete(true);
-        writeData(btoa("03") , CONTROL_BITS_UUID);  //50
+        writeData(btoa("20") , CONTROL_BITS_UUID);  //50
         console.log("sent calibrate control SENT MDE= decode to ascii from base64 ==01 ");
       }
       return () => clearTimeout(timer);

@@ -33,7 +33,29 @@ import {calcomplete} from './calibration';
 // };
 
 let kfdata: number[] = [0.0, 20.0, 45.0, 90.0 ];
+let kfdata1: number[] = [-5.0, 0.0, -3.0, 5.0, 0.0, 3.0];
+let kfdata2: number[] = [9.0, 0.0, 5.0, -10.0, 0.0, -6.0];
+let kfdata3: number[] = [18.0, 0.0, 11.0, -18.0, 0.0, -11.0];
+let kfdata4: number[] = [23.0, 0.0,  25.0, -24.0, 0.0, -25.0];
 
+function floatsToBase64(floats: number[]): string {
+  // Create a byte array to store the float values
+  const buffer = new ArrayBuffer(4 * floats.length);
+  const view = new DataView(buffer);
+
+  // Set the float values in the byte array
+  for (let i = 0; i < floats.length; i++) {
+    view.setFloat32(i * 4, floats[i], false); // false indicates big-endian byte order
+  }
+
+  // Convert the ArrayBuffer to a Uint8Array
+  const bytes = new Uint8Array(buffer);
+
+  // Encode the Uint8Array as Base64
+  const base64 = btoa(String.fromCharCode(...bytes));
+
+  return base64;
+}
 const alertbuttons = {
   width: 150,
   height: 50,
@@ -130,8 +152,9 @@ const WorkoutComp = ({ route }: Props) => {
       // send to pi look for kf 1 & update image to kf 1
       let kfstring = String(kfdata[0]);
       
-      await writeData(btoa(kfstring), KEY_FRAME_DATA_UUID);  //8 bytes
-      
+      // await writeData(btoa("-5 0 -3 5 0 3"), KEY_FRAME_DATA_UUID);  //8 bytes
+      await writeData(btoa(), KEY_FRAME_DATA_UUID);
+      await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
       setimgSrc(require('./assets/step1.png'));
       
       // wait for kf 1 result
@@ -161,6 +184,8 @@ const WorkoutComp = ({ route }: Props) => {
         badFlag = true; // raise flag for mistake was made during rep;
         continue;
       }
+
+      await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
 
       console.log("Hit keyframe 1");
       setimgSrc(require('./assets/step2.png'));
@@ -193,7 +218,7 @@ const WorkoutComp = ({ route }: Props) => {
         badFlag = true; // raise flag for mistake was made during rep;
         continue;
       }
-
+      await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
       console.log("Hit keyframe 2");
       setimgSrc(require('./assets/step3.png'));
       kfstring = String(kfdata[2]);
@@ -226,7 +251,7 @@ const WorkoutComp = ({ route }: Props) => {
         badFlag = true; // raise flag for mistake was made during rep;
         continue;
       }
-
+      await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
       console.log("Hit keyframe 3");
       setimgSrc(require('./assets/step4.png'));
       kfstring = String(kfdata[3]);
@@ -258,7 +283,7 @@ const WorkoutComp = ({ route }: Props) => {
         badFlag = true; // raise flag for mistake was made during rep;
         continue;
       }
-
+      await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
       console.log("Hit keyframe 4");
 
       console.log(`Rep ${i} completed`);
@@ -281,7 +306,7 @@ const WorkoutComp = ({ route }: Props) => {
     console.log("workout score:", exerciseData.score, exerciseData.bad, exerciseData.good);
     
     setexEnd(true);
-    await writeData(btoa("04"), KEY_FRAME_DATA_UUID);  //send 51 (exercisedone)
+    await writeData(btoa("30"), KEY_FRAME_DATA_UUID);  //send 51 (exercisedone)
 
   };
    
