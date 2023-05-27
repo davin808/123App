@@ -262,36 +262,36 @@ const WorkoutComp = ({ route }: Props) => {
       console.log("Hit keyframe 3");
       
       
-      await writeData(floatsToBase64(kfdata4), KEY_FRAME_DATA_UUID);
+      // await writeData(floatsToBase64(kfdata4), KEY_FRAME_DATA_UUID);
 
 
-      // wait for kf 4 result
-      //while 1 break after timout or hit timout or hit timeout or hit
-      while(1){
-        await readData(KEY_FRAME_HIT_UUID);
-        // console.log("read value:", hexString);
-        // console.log(hexString);
-        if(hexStringGlobal == "01" || hexStringGlobal == "00"){
-          break;
-        }
+      // // wait for kf 4 result
+      // //while 1 break after timout or hit timout or hit timeout or hit
+      // while(1){
+      //   await readData(KEY_FRAME_HIT_UUID);
+      //   // console.log("read value:", hexString);
+      //   // console.log(hexString);
+      //   if(hexStringGlobal == "01" || hexStringGlobal == "00"){
+      //     break;
+      //   }
         
-      }
-      //await delay(1000);
-      //if timeout
-      if (hexStringGlobal == '00') {  
-        console.log("TIMOUT: missed keyframe 4");
-        // if read kf missed start from top of for loop (reset rep).
-        // have 3 sec timer to let patient ready to get ready & show incorrect image
-        setimgSrc(require('./assets/incorrect.png'));
-        //wait for 3 seconds and prompt that rep is restarting in x time
-        // to reset rep
+      // }
+      // //await delay(1000);
+      // //if timeout
+      // if (hexStringGlobal == '00') {  
+      //   console.log("TIMOUT: missed keyframe 4");
+      //   // if read kf missed start from top of for loop (reset rep).
+      //   // have 3 sec timer to let patient ready to get ready & show incorrect image
+      //   setimgSrc(require('./assets/incorrect.png'));
+      //   //wait for 3 seconds and prompt that rep is restarting in x time
+      //   // to reset rep
     
-        i-=1;
-        badFlag = true; // raise flag for mistake was made during rep;
-        continue;
-      }
-      await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
-      console.log("Hit keyframe 4");
+      //   i-=1;
+      //   badFlag = true; // raise flag for mistake was made during rep;
+      //   continue;
+      // }
+      // await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
+      // console.log("Hit keyframe 4");
 
       console.log(`Rep ${i} completed`);
       data.reps -= 1;
@@ -426,7 +426,7 @@ const WorkoutComp = ({ route }: Props) => {
         }
 
         {exEnd
-            ? <Text>Exercise Completed! Score = {score}%</Text>
+            ? <Text style= {{textAlign: 'center'}}>Exercise Completed! Score = {score}%</Text>
             : <Text></Text>
         }
 
