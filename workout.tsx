@@ -30,12 +30,13 @@ import {calcomplete} from './calibration';
 
 // type ChildProps = {
 //     reps: number;
-// };
+// // };
+// let kfdata1: number[] = [-5.0, 0.0, -3.0, 5.0, 0.0, 3.0];
+// let kfdata2: number[] = [9.0, 0.0, 5.0, -10.0, 0.0, -6.0];
 
 
-
-let kfdata1: number[] = [-5.0, 0.0, -3.0, 5.0, 0.0, 3.0];
-let kfdata2: number[] = [9.0, 0.0, 5.0, -10.0, 0.0, -6.0];
+let kfdata1: number[] = [-7.0, 0.0, -2.2, 7.5, 0.0, -1.0];
+let kfdata2: number[] = [-12.5, 0.0, 7.0, 11.0, 0.0, -7.0];
 let kfdata3: number[] = [18.0, 0.0, 11.0, -18.0, 0.0, -11.0];
 let kfdata4: number[] = [23.0, 0.0,  25.0, -24.0, 0.0, -25.0];
 
@@ -226,40 +227,40 @@ const WorkoutComp = ({ route }: Props) => {
       console.log("Hit keyframe 2");
       
       
-      await writeData(floatsToBase64(kfdata3), KEY_FRAME_DATA_UUID);
+      // await writeData(floatsToBase64(kfdata3), KEY_FRAME_DATA_UUID);
 
       
-      // wait for kf 3 result
-      //while 1 break after timout or hit timout or hit timeout or hit
-      while(1){
-        await readData(KEY_FRAME_HIT_UUID);
-        // console.log("read value:", hexString);
-        // console.log(hexString);
-        if(hexStringGlobal == "01" || hexStringGlobal == "00"){
-          break;
-        }
+      // // wait for kf 3 result
+      // //while 1 break after timout or hit timout or hit timeout or hit
+      // while(1){
+      //   await readData(KEY_FRAME_HIT_UUID);
+      //   // console.log("read value:", hexString);
+      //   // console.log(hexString);
+      //   if(hexStringGlobal == "01" || hexStringGlobal == "00"){
+      //     break;
+      //   }
         
-      }
+      // }
 
-      //await delay(1000);
-      //if timeout
-      if (hexStringGlobal == '00') {  
-        console.log("TIMOUT: missed keyframe 3");
-        // if read kf missed start from top of for loop (reset rep).
-        // have 3 sec timer to let patient ready to get ready & show incorrect image
-        setimgSrc(require('./assets/incorrect.png'));
-        //wait for 3 seconds and prompt that rep is restarting in x time
-        // to reset rep
-        //data.reps+=1;
-        i-=1;
-        badFlag = true; // raise flag for mistake was made during rep;
-        continue;
-      }
-      setimgSrc(require('./assets/step4.png'));
+      // //await delay(1000);
+      // //if timeout
+      // if (hexStringGlobal == '00') {  
+      //   console.log("TIMOUT: missed keyframe 3");
+      //   // if read kf missed start from top of for loop (reset rep).
+      //   // have 3 sec timer to let patient ready to get ready & show incorrect image
+      //   setimgSrc(require('./assets/incorrect.png'));
+      //   //wait for 3 seconds and prompt that rep is restarting in x time
+      //   // to reset rep
+      //   //data.reps+=1;
+      //   i-=1;
+      //   badFlag = true; // raise flag for mistake was made during rep;
+      //   continue;
+      // }
+      // setimgSrc(require('./assets/step4.png'));
 
 
-      await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
-      console.log("Hit keyframe 3");
+      // await writeData(btoa("10"), KEY_FRAME_HIT_UUID);  //pending to kf hit
+      // console.log("Hit keyframe 3");
       
       
       // await writeData(floatsToBase64(kfdata4), KEY_FRAME_DATA_UUID);
